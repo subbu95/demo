@@ -1,17 +1,4 @@
-import { Component } from '@angular/core';
-import { DropdownItem } from './dropdown/dropdown.model';
-import { DropdownComponent } from './dropdown/dropdown.component';
-
-
-@Component({
-  selector: 'app-root',
-  imports: [DropdownComponent],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
-})
-export class AppComponent {
-  title = 'demo';
-  menuItems: DropdownItem[] = [
+[
     {
         "label": "Technology Landscape",
         "children": [
@@ -179,9 +166,4 @@ export class AppComponent {
             }
         ]
     }
-];
-
-  onItemSelected(selected: string) {
-    console.log('Selected item:', selected);
-  }
-}
+]

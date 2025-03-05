@@ -1,0 +1,21 @@
+<div class="dropdown" (clickOutside)="isOpen = false">
+    <div class="dropdown-toggle" (click)="toggleDropdown()">
+      <span>
+        {{ selectedLabel || placeholder }}
+      </span>
+      <span class="arrow">&#9662;</span>
+    </div>
+    <div class="dropdown-menu" *ngIf="isOpen">
+      <div *ngIf="menuStack.length" class="back-button" (click)="navigateBack()">
+        ← Main Menu
+      </div>
+      <div *ngFor="let item of activeMenu" class="dropdown-item">
+        <div *ngIf="item.children; else leafItem" (click)="navigateToSubmenu(item.children)">
+          {{ item.label }} →
+        </div>
+        <ng-template #leafItem>
+          <div (click)="selectItem(item.label)">{{ item.label }}</div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
