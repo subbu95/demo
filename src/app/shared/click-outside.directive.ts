@@ -6,7 +6,7 @@ import { Directive, Output, ElementRef,  EventEmitter, HostListener } from '@ang
 export class ClickOutsideDirective {
   @Output() clickOutside = new EventEmitter<void>();
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(private readonly elementRef: ElementRef) {}
 
   @HostListener('document:click', ['$event'])
   onClick(event: Event) {

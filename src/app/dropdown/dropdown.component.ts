@@ -13,7 +13,6 @@ export class DropdownComponent {
   @Output() itemSelected = new EventEmitter<string>();
   
   isOpen = false;
-  selectedLabel: string | null = null;
   activeMenu: any[] | null = null;
   menuStack: any[][] = [];
 
@@ -34,11 +33,9 @@ export class DropdownComponent {
   }
 
   selectItem(item: string) {
-    this.selectedLabel = item;
     this.itemSelected.emit(item);
     this.isOpen = false;
     this.menuStack = [];
     this.activeMenu = this.items;
   }
-
 }
