@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter} from '@angular/core';
+import { Component, Input, Output, EventEmitter, HostListener, ElementRef} from '@angular/core';
 
 @Component({
   selector: 'app-dropdown',
@@ -8,6 +8,9 @@ import { Component, Input, Output, EventEmitter} from '@angular/core';
   styleUrl: './dropdown.component.scss'
 })
 export class DropdownComponent {
+
+  constructor(public elementRef: ElementRef) {}
+  
   @Input() items: { label: string, children?: { label: string, children?: any[] }[] }[] = [];
   @Input() placeholder: string = 'Select';
   @Output() itemSelected = new EventEmitter<string>();
@@ -37,5 +40,13 @@ export class DropdownComponent {
     this.isOpen = false;
     this.menuStack = [];
     this.activeMenu = this.items;
+  }
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event) {
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.isOpen = false;
+      this.menuStack = [];
+      this.activeMenu = this.items;
+    }
   }
 }
