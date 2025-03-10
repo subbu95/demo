@@ -1,0 +1,14 @@
+<div class="menu-container" (mouseenter)="openMainMenu()" (mouseleave)="closeDropdown()">
+  <button class="menu-button">Main Menu</button>
+
+  <div *ngIf="isDropdownOpen" class="dropdown">
+    <button *ngIf="menuStack.length > 0" class="back-button" (click)="goBack()">← Back</button>
+
+    <ul>
+      <li *ngFor="let item of currentMenu" (click)="openSubmenu(item)">
+        <span>{{ item.label }}</span>
+        <span *ngIf="item.children">›</span>
+      </li>
+    </ul>
+  </div>
+</div>
