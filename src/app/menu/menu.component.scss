@@ -23,7 +23,7 @@
   padding: 5px;
   display: flex;
   flex-direction: column;
-  max-height: 300px; /* Increased height by 50% */
+  max-height: 85vh; /* 100% more increase */
 }
 
 .back-button {
@@ -33,6 +33,17 @@
   width: 100%;
   text-align: left;
   font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.current-menu-class {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
   cursor: pointer;
 }
 
@@ -46,7 +57,7 @@
 }
 
 .scrollable-menu {
-  max-height: 300px; /* Increased height by 50% */
+  max-height: 85vh; /* Increased by another 100% */
   overflow-y: auto;
   scrollbar-width: thin; /* Thin scrollbar for Firefox */
   scrollbar-color: #888 transparent;
@@ -84,4 +95,4 @@
   background: #f0f0f0;
 }
 
-/* Removed active state (blue highlight) for single dropdown */
+/* No active state (blue highlight) for single dropdown */

@@ -2,19 +2,20 @@
   <button class="menu-button">Main Menu</button>
 
   <div *ngIf="isDropdownOpen" class="dropdown">
-    <button class="back-button" (click)="goBack()" *ngIf="menuStack.length > 0">← Back</button>
-    <h3 class="menu-title">{{ selectedMenuTitle }}</h3>
+    <button class="back-button" (click)="goBack()" *ngIf="menuStack.length > 0">←   Return</button>
+    <h3 *ngIf="selectedMenuTitle !== 'Main Menu'" class="menu-title">{{ selectedMenuTitle }}</h3>
 
     <div class="scrollable-menu">
       <ul>
-        <li *ngFor="let item of currentMenu; let i = index" 
-            (click)="openSubmenu(item, i)"
-            (keydown)="navigate($event, i, item)"
-            (keypress)="navigate($event, i, item)"
-            (keyup)="navigate($event, i, item)"
-            [class.active]="i === activeIndex"
-            tabindex="0">
-          <span>{{ item.label }}</span>
+        <li *ngFor="let item of currentMenu; let i = index">
+          <button
+          class="current-menu-class"
+          (click)="openSubmenu(item, i)"
+          (keydown)="navigate($event, i, item)"
+          (keypress)="navigate($event, i, item)"
+          (keyup)="navigate($event, i, item)"
+          [class.active]="i === activeIndex">{{ item.label }}</button>
+          <!-- <span>{{ item.label }}</span> -->
           <span *ngIf="item.children">›</span>
         </li>
       </ul>
