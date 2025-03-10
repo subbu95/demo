@@ -18,8 +18,51 @@
   left: 0;
   background: white;
   border: 1px solid #ccc;
-  width: 200px;
+  width: 220px;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  max-height: 300px; /* Increased height by 50% */
+}
+
+.back-button {
+  background: none;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  text-align: left;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.menu-title {
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  padding: 5px 0;
+  background: #f8f8f8;
+  border-bottom: 1px solid #ddd;
+}
+
+.scrollable-menu {
+  max-height: 300px; /* Increased height by 50% */
+  overflow-y: auto;
+  scrollbar-width: thin; /* Thin scrollbar for Firefox */
+  scrollbar-color: #888 transparent;
+}
+
+.scrollable-menu::-webkit-scrollbar {
+  width: 4px; /* Very thin scrollbar */
+}
+
+.scrollable-menu::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.scrollable-menu::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 .dropdown ul {
@@ -34,18 +77,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-radius: 3px;
 }
 
 .dropdown li:hover {
   background: #f0f0f0;
 }
 
-.back-button {
-  background: none;
-  border: none;
-  padding: 10px;
-  width: 100%;
-  text-align: left;
-  font-weight: bold;
-  cursor: pointer;
-}
+/* Removed active state (blue highlight) for single dropdown */
