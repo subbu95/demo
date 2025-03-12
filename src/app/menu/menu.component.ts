@@ -205,39 +205,39 @@ export class MenuComponent {
 
 currentMenu: MenuItem[] = this.menuItems;
 menuStack: MenuItem[][] = [];
-selectedMenuTitle: string = 'Main Menu';
+activeIndex: number = 0;
 isDropdownOpen: boolean = false;
-activeIndex: number = 0; // For keyboard navigation
 
-openMainMenu(): void {
-  this.isDropdownOpen = true;
+// Open main dropdown
+toggleDropdown(): void {
+  this.isDropdownOpen = !this.isDropdownOpen;
+  if (!this.isDropdownOpen) this.resetMenu();
 }
 
-closeDropdown(): void {
-  this.isDropdownOpen = false;
-  this.menuStack = [];
-  this.currentMenu = this.menuItems;
-  this.selectedMenuTitle = 'Main Menu';
-}
-
+// Navigate to submenu
 openSubmenu(item: MenuItem, index: number): void {
   if (item.children) {
     this.menuStack.push(this.currentMenu);
     this.currentMenu = item.children;
-    this.selectedMenuTitle = item.label; // Show selected menu as heading
     this.activeIndex = 0;
   }
 }
 
+// Go back to previous menu
 goBack(): void {
   if (this.menuStack.length > 0) {
     this.currentMenu = this.menuStack.pop()!;
-    this.selectedMenuTitle = this.menuStack.length > 0 ? this.menuStack[this.menuStack.length - 1][0].label : 'Main Menu';
     this.activeIndex = 0;
+  } else {
+    this.isDropdownOpen = false;
   }
 }
 
-navigate(event: KeyboardEvent, index: number, item: MenuItem): void {
+// Handle keyboard navigation
+@HostListener('document:keydown', ['$event'])
+navigate(event: KeyboardEvent): void {
+  if (!this.isDropdownOpen) return;
+
   switch (event.key) {
     case 'ArrowDown':
       this.activeIndex = (this.activeIndex + 1) % this.currentMenu.length;
@@ -245,20 +245,26 @@ navigate(event: KeyboardEvent, index: number, item: MenuItem): void {
     case 'ArrowUp':
       this.activeIndex = (this.activeIndex - 1 + this.currentMenu.length) % this.currentMenu.length;
       break;
-    case 'Enter':
     case 'ArrowRight':
-      this.openSubmenu(item, index);
+    case 'Enter':
+      if (this.currentMenu[this.activeIndex]?.children) {
+        this.openSubmenu(this.currentMenu[this.activeIndex], this.activeIndex);
+      }
+      break;
+    case 'ArrowLeft':
+      this.goBack();
       break;
     case 'Escape':
-      this.closeDropdown();
+      this.isDropdownOpen = false;
+      this.resetMenu();
       break;
   }
 }
 
-@HostListener('document:keydown', ['$event'])
-handleGlobalKeyboard(event: KeyboardEvent): void {
-  if (event.key === 'Escape') {
-    this.closeDropdown();
-  }
+// Reset menu to main
+resetMenu(): void {
+  this.currentMenu = this.menuItems;
+  this.menuStack = [];
+  this.activeIndex = 0;
 }
 }

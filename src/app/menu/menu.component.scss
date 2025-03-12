@@ -1,98 +1,61 @@
 .menu-container {
   position: relative;
   display: inline-block;
-}
 
-.menu-button {
-  background: #0073e6;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-}
+  button {
+    padding: 10px 15px;
+    background: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
 
-.dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: white;
-  border: 1px solid #ccc;
-  width: 220px;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-  padding: 5px;
-  display: flex;
-  flex-direction: column;
-  max-height: 85vh; /* 100% more increase */
-}
+  .dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    width: 200px;
+    max-height: 400px; /* Increased height */
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    
+    /* Scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
 
-.back-button {
-  background: none;
-  border: none;
-  padding: 10px;
-  width: 100%;
-  text-align: left;
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
 
-.current-menu-class {
-  background: none;
-  border: none;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-}
+    &::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 10px;
+    }
 
-.menu-title {
-  font-size: 16px;
-  font-weight: bold;
-  text-align: center;
-  padding: 5px 0;
-  background: #f8f8f8;
-  border-bottom: 1px solid #ddd;
-}
+    li {
+      padding: 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      
+      &:hover, &.active {
+        background: #007bff;
+        color: white;
+      }
+    }
 
-.scrollable-menu {
-  max-height: 85vh; /* Increased by another 100% */
-  overflow-y: auto;
-  scrollbar-width: thin; /* Thin scrollbar for Firefox */
-  scrollbar-color: #888 transparent;
-}
+    .back-button {
+      font-weight: bold;
+      padding: 10px;
+      cursor: pointer;
+      background: #f8f9fa;
+      border-bottom: 1px solid #ccc;
 
-.scrollable-menu::-webkit-scrollbar {
-  width: 4px; /* Very thin scrollbar */
+      &:hover {
+        background: #ddd;
+      }
+    }
+  }
 }
-
-.scrollable-menu::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
-}
-
-.scrollable-menu::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-.dropdown ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.dropdown li {
-  padding: 10px;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-radius: 3px;
-}
-
-.dropdown li:hover {
-  background: #f0f0f0;
-}
-
-/* No active state (blue highlight) for single dropdown */

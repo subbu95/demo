@@ -1,24 +1,15 @@
-<div class="menu-container" (mouseenter)="openMainMenu()" (mouseleave)="closeDropdown()">
-  <button class="menu-button">Main Menu</button>
+<div class="menu-container">
+  <!-- Main Dropdown -->
+  <button (click)="toggleDropdown()" (mouseenter)="toggleDropdown()">Menu</button>
+  
+  <ul *ngIf="isDropdownOpen" class="dropdown">
+    <li class="back-button" *ngIf="menuStack.length > 0" (click)="goBack()">⬅ Back</li>
 
-  <div *ngIf="isDropdownOpen" class="dropdown">
-    <button class="back-button" (click)="goBack()" *ngIf="menuStack.length > 0">←   Return</button>
-    <h3 *ngIf="selectedMenuTitle !== 'Main Menu'" class="menu-title">{{ selectedMenuTitle }}</h3>
-
-    <div class="scrollable-menu">
-      <ul>
-        <li *ngFor="let item of currentMenu; let i = index">
-          <button
-          class="current-menu-class"
-          (click)="openSubmenu(item, i)"
-          (keydown)="navigate($event, i, item)"
-          (keypress)="navigate($event, i, item)"
-          (keyup)="navigate($event, i, item)"
-          [class.active]="i === activeIndex">{{ item.label }}</button>
-          <!-- <span>{{ item.label }}</span> -->
-          <span *ngIf="item.children">›</span>
-        </li>
-      </ul>
-    </div>
-  </div>
+    <li *ngFor="let item of currentMenu; let i = index"
+        [class.active]="i === activeIndex"
+        (click)="openSubmenu(item, i)"
+        tabindex="0">
+      {{ item.label }}
+    </li>
+  </ul>
 </div>
