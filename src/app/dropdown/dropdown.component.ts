@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   standalone: true,
-  selector: 'app-menu',
+  selector: 'app-dropdown',
   imports: [CommonModule, MatFormFieldModule, MatInputModule, MatTooltipModule, MatIconModule],
   template: `
     <mat-form-field appearance="outline" class="full-width" (click)="toggleDropdown()">
@@ -48,7 +48,7 @@ import { MatIconModule } from '@angular/material/icon';
     }
   `]
 })
-export class MenuComponent {
+export class DropdownComponent {
   options: string[] = [
     "Afghanistan",
     "Albania",
@@ -256,6 +256,7 @@ export class MenuComponent {
   searchIndexes: number[] = [];
   searchPosition = 0;
   lastSearchKey = '';
+  searchTimeout: any;
 
   get sortedOptions(): string[] {
     return [...this.options].sort((a, b) => a.localeCompare(b));
@@ -270,16 +271,26 @@ export class MenuComponent {
     }
 
     if (event.key.match(/^[a-zA-Z]$/)) {
-      if (this.lastSearchKey === event.key) {
-        this.searchPosition = (this.searchPosition + 1) % this.searchIndexes.length;
-      } else {
+      // Reset search buffer if new key is different from the last pressed key
+      if (this.lastSearchKey !== event.key) {
         this.searchBuffer = event.key.toLowerCase();
         this.updateSearchIndexes();
         this.searchPosition = 0;
+      } else {
+        this.searchPosition = (this.searchPosition + 1) % this.searchIndexes.length;
       }
 
       this.lastSearchKey = event.key;
       this.highlightNextMatch();
+
+      // Reset buffer after a short delay for fast typing support
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = setTimeout(() => {
+        this.searchBuffer = '';
+        this.searchIndexes = [];
+        this.searchPosition = 0;
+        this.lastSearchKey = '';
+      }, 1000);
     }
 
     if (event.key === 'Enter' && this.highlightedIndex !== -1) {
