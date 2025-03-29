@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Dropdown003Component } from './dropdown003/dropdown003.component';
+import { RouterOutlet } from '@angular/router';
 
 interface MenuItem {
   label: string;
@@ -9,7 +9,7 @@ interface MenuItem {
 
 @Component({
   selector: 'app-root',
-  imports: [ CommonModule, Dropdown003Component],
+  imports: [ CommonModule, RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
