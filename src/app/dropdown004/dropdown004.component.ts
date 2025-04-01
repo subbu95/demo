@@ -25,7 +25,13 @@ import { FormsModule } from '@angular/forms';
   `,
   styles: [
     `.dropdown-container { width: 450px; } /* Increased width by 50% */
-     .custom-dropdown { max-height: 75vh !important; min-width: 450px !important; }
+     .custom-dropdown { 
+       max-height: 75vh !important; 
+       min-width: 450px !important; 
+       overflow-y: auto; 
+       border: 1px solid #CCCCCC !important;
+       box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.2) !important;
+     }
      .highlight { background-color: lightblue !important; }`
   ]
 })
@@ -41,16 +47,18 @@ export class Dropdown004Component {
   onKeyPress(event: KeyboardEvent) {
     const key = event.key.toLowerCase();
     if (key === 'arrowdown') {
+      event.preventDefault();
       this.highlightedIndex = (this.highlightedIndex + 1) % this.filteredOptions.length;
       this.selectedOption = this.filteredOptions[this.highlightedIndex];
     } else if (key === 'arrowup') {
+      event.preventDefault();
       this.highlightedIndex = (this.highlightedIndex - 1 + this.filteredOptions.length) % this.filteredOptions.length;
       this.selectedOption = this.filteredOptions[this.highlightedIndex];
     } else if (/^[a-zA-Z]$/.test(key)) {
       clearTimeout(this.searchTimeout);
       this.searchBuffer += key;
       
-      const matches = this.filteredOptions.filter(opt => opt.toLowerCase().startsWith(this.searchBuffer));
+      const matches = this.filteredOptions.filter(opt => opt.toLowerCase().includes(this.searchBuffer));
       if (matches.length > 0) {
         this.matchIndex = (this.matchIndex + 1) % matches.length;
         this.selectedOption = matches[this.matchIndex];
@@ -60,7 +68,7 @@ export class Dropdown004Component {
       this.searchTimeout = setTimeout(() => {
         this.searchBuffer = '';
         this.matchIndex = 0;
-      }, 100); // 5s buffer for fast typing
+      }, 5000); // 5s buffer for fast typing
     }
   }
 
