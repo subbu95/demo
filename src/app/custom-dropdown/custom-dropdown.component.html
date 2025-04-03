@@ -1,7 +1,8 @@
 <mat-form-field appearance="outline" class="dropdown-container">
     <mat-label>Work Team</mat-label>
     <mat-select #matSelect [formControl]="searchControl" (keydown)="onKeyPress($event)">
-      <mat-option *ngFor="let option of filteredOptions" [value]="option" [matTooltip]="option">
+      <mat-option *ngFor="let option of options; let i = index" [value]="option"
+                  [class.highlighted]="i === highlightedIndex">
         {{ option }}
       </mat-option>
     </mat-select>

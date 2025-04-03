@@ -6,14 +6,41 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
-import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-custom-dropdown',
   standalone: true,
-  imports: [CommonModule, MatFormFieldModule, MatInputModule, MatOptionModule, MatSelectModule, ReactiveFormsModule, MatTooltipModule],
-  templateUrl: './custom-dropdown.component.html',
-  styleUrls: ['./custom-dropdown.component.scss']
+  imports: [CommonModule, MatFormFieldModule, MatInputModule, MatOptionModule, MatSelectModule, ReactiveFormsModule],
+  template: `
+    <mat-form-field appearance="outline" class="dropdown-container">
+      <mat-label>Work Team</mat-label>
+      <mat-select #matSelect [formControl]="searchControl" (keydown)="onKeyPress($event)">
+        <mat-option *ngFor="let option of options; let i = index" [value]="option"
+                    [class.highlighted]="i === highlightedIndex">
+          {{ option }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  `,
+  styles: [
+    `
+    .dropdown-container {
+      width: 200px;
+    }
+    mat-option {
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .highlighted {
+      background-color: lightblue !important;
+    }
+    mat-select-panel {
+      max-height: 75vh;
+    }
+    `
+  ]
 })
 export class CustomDropdownComponent implements OnInit {
   @ViewChild(MatSelect) matSelect!: MatSelect;
@@ -219,23 +246,21 @@ export class CustomDropdownComponent implements OnInit {
     "Zimbabwe"
 ];
   searchControl = new FormControl('No Work Team');
-  filteredOptions: string[] = [];
   highlightedIndex: number = -1;
+  searchText: string = '';
+  searchTimeout: any;
 
   ngOnInit(): void {
     this.options.sort((a, b) => a.localeCompare(b)); // Sort options alphabetically
-    this.resetOptions();
-  }
-
-  resetOptions(): void {
-    this.filteredOptions = [...this.options];
-    this.highlightedIndex = -1;
   }
 
   onKeyPress(event: KeyboardEvent): void {
     const key = event.key.toLowerCase();
     if (key.length === 1 && /[a-z]/.test(key)) {
-      this.filterOptions(key);
+      clearTimeout(this.searchTimeout);
+      this.searchText += key;
+      this.highlightFirstMatch(this.searchText);
+      this.searchTimeout = setTimeout(() => this.searchText = '', 5000); // Reset search text if no typing after 500ms
     } else if (key === 'arrowdown') {
       this.navigateOptions(1);
     } else if (key === 'arrowup') {
@@ -243,25 +268,27 @@ export class CustomDropdownComponent implements OnInit {
     }
   }
 
-  filterOptions(search: string): void {
-    this.filteredOptions = this.options.filter(opt => opt.toLowerCase().includes(search));
-    if (this.filteredOptions.length) {
-      this.highlightedIndex = 0;
-      this.searchControl.setValue(this.filteredOptions[0]);
+  highlightFirstMatch(search: string): void {
+    const matches = this.options.filter(opt => opt.toLowerCase().includes(search));
+    if (matches.length) {
+      this.highlightedIndex = this.options.indexOf(matches[0]);
+      this.searchControl.setValue(matches[0]);
     }
   }
 
   navigateOptions(step: number): void {
-    if (this.filteredOptions.length) {
-      this.highlightedIndex = (this.highlightedIndex + step + this.filteredOptions.length) % this.filteredOptions.length;
-      this.searchControl.setValue(this.filteredOptions[this.highlightedIndex]);
-    }
+    if (this.highlightedIndex === -1) return; // Ensure navigation starts from a highlighted value
+    
+    this.highlightedIndex = (this.highlightedIndex + step + this.options.length) % this.options.length;
+    this.searchControl.setValue(this.options[this.highlightedIndex]);
   }
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event): void {
     if (!this.matSelect.panelOpen) {
-      this.resetOptions();
+      this.searchControl.setValue('No Work Team'); // Reset to default text on close
+      this.highlightedIndex = -1;
+      this.searchText = '';
     }
   }
 }

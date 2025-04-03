@@ -6,10 +6,15 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+  
+      &.highlighted {
+        background-color: lightblue !important;
+      }
     }
   
     mat-select-panel {
       max-height: 75vh;
     }
   }
+
   
