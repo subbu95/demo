@@ -1,0 +1,15 @@
+.dropdown-container {
+    width: 200px;
+  
+    mat-option {
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  
+    mat-select-panel {
+      max-height: 75vh;
+    }
+  }
+  

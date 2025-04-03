@@ -5,6 +5,7 @@ import { Dropdown002Component } from './dropdown002/dropdown002.component';
 import { Dropdown003Component } from './dropdown003/dropdown003.component';
 import { Dropdown004Component } from './dropdown004/dropdown004.component';
 import { Dropdown005Component } from './dropdown005/dropdown005.component';
+import { CustomDropdownComponent } from './custom-dropdown/custom-dropdown.component';
 
 export const routes: Routes = [
   {
@@ -30,6 +31,10 @@ export const routes: Routes = [
   {
     path: 'drop',
     component: Dropdown005Component
+  },
+  {
+    path: 'dropdown',
+    component: CustomDropdownComponent
   },
   {
     path: '**',
