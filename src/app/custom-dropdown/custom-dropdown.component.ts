@@ -14,9 +14,9 @@ import { MatSelectModule } from '@angular/material/select';
   template: `
     <mat-form-field appearance="outline" class="dropdown-container">
       <mat-label>Work Team</mat-label>
-      <mat-select #matSelect [formControl]="searchControl" (keydown)="onKeyPress($event)">
+      <mat-select #matSelect [formControl]="searchControl" (keydown)="onKeyPress($event)" (selectionChange)="onOptionClick1($event.value)">
         <mat-option *ngFor="let option of options; let i = index" [value]="option"
-                    [class.highlighted]="i === highlightedIndex">
+                    [class.highlighted]="i === highlightedIndex" (click)="onOptionClick(option, i)">
           {{ option }}
         </mat-option>
       </mat-select>
@@ -254,13 +254,13 @@ export class CustomDropdownComponent implements OnInit {
     this.options.sort((a, b) => a.localeCompare(b)); // Sort options alphabetically
   }
 
-  onKeyPress(event: KeyboardEvent): void {
+  onKeyPress(event: KeyboardEvent): void {    
     const key = event.key.toLowerCase();
     if (key.length === 1 && /[a-z]/.test(key)) {
       clearTimeout(this.searchTimeout);
       this.searchText += key;
       this.highlightFirstMatch(this.searchText);
-      this.searchTimeout = setTimeout(() => this.searchText = '', 5000); // Reset search text if no typing after 500ms
+      this.searchTimeout = setTimeout(() => this.searchText = '', 500); // Reset search text if no typing after 500ms
     } else if (key === 'arrowdown') {
       this.navigateOptions(1);
     } else if (key === 'arrowup') {
@@ -268,7 +268,7 @@ export class CustomDropdownComponent implements OnInit {
     }
   }
 
-  highlightFirstMatch(search: string): void {
+  highlightFirstMatch(search: string): void {   
     const matches = this.options.filter(opt => opt.toLowerCase().includes(search));
     if (matches.length) {
       this.highlightedIndex = this.options.indexOf(matches[0]);
@@ -277,10 +277,22 @@ export class CustomDropdownComponent implements OnInit {
   }
 
   navigateOptions(step: number): void {
-    if (this.highlightedIndex === -1) return; // Ensure navigation starts from a highlighted value
-    
+    if (this.highlightedIndex === -1) return; // Ensure navigation starts from a highlighted value    
     this.highlightedIndex = (this.highlightedIndex + step + this.options.length) % this.options.length;
     this.searchControl.setValue(this.options[this.highlightedIndex]);
+  }
+
+  onOptionClick(option: string, index: number): void {
+    this.highlightedIndex = index;
+    this.searchControl.setValue(option);
+  }
+
+  onOptionClick1(option: any): void {    
+    const index = this.options.indexOf(option);
+  if (index !== -1) {
+    this.highlightedIndex = index;
+    this.searchControl.setValue(option);
+  }
   }
 
   @HostListener('document:click', ['$event'])
