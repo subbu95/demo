@@ -14,7 +14,6 @@ interface MenuItem {
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'demo'; 
-  
+  title = 'demo';
 
 }

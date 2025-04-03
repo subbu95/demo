@@ -9,13 +9,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
-  selector: 'app-dropdown004',
+  selector: 'app-dropdown005',
   standalone: true,
   imports: [CommonModule, MatFormFieldModule, MatInputModule, MatOptionModule, MatSelectModule, ReactiveFormsModule, MatTooltipModule],
-  templateUrl: './dropdown004.component.html',
-  styleUrls: ['./dropdown004.component.scss']
+  templateUrl: './dropdown005.component.html',
+  styleUrls: ['./dropdown005.component.scss']
 })
-export class Dropdown004Component implements OnInit {
+export class Dropdown005Component implements OnInit {
   @ViewChild(MatSelect) matSelect!: MatSelect;
   @ViewChild('searchInput') searchInput!: ElementRef;
   
@@ -218,10 +218,9 @@ export class Dropdown004Component implements OnInit {
     "Zambia",
     "Zimbabwe"
 ];
-  searchControl = new FormControl('');
+  searchControl = new FormControl('No Work Team');
   filteredOptions: string[] = [];
   highlightedIndex: number = -1;
-  defaultText = 'No Work Team';
 
   ngOnInit(): void {
     this.options.sort((a, b) => a.localeCompare(b)); // Sort options alphabetically

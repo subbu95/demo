@@ -1,7 +1,6 @@
 <mat-form-field appearance="outline" class="dropdown-container">
     <mat-label>Work Team</mat-label>
     <mat-select #matSelect [formControl]="searchControl">
-      <mat-option [value]="defaultText" disabled>{{ defaultText }}</mat-option>
       <mat-option *ngFor="let option of filteredOptions" [value]="option" [matTooltip]="option">
         {{ option }}
       </mat-option>
