@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { MatSelect } from '@angular/material/select';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -6,17 +6,21 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-custom-dropdown',
   standalone: true,
-  imports: [CommonModule, MatFormFieldModule, MatInputModule, MatOptionModule, MatSelectModule, ReactiveFormsModule],
+  imports: [CommonModule, MatFormFieldModule, MatInputModule, MatOptionModule, MatSelectModule, MatIconModule, ReactiveFormsModule],
   template: `
     <mat-form-field appearance="outline" class="dropdown-container">
       <mat-label>Work Team</mat-label>
-      <mat-select #matSelect [formControl]="searchControl" (keydown)="onKeyPress($event)" (selectionChange)="onOptionClick1($event.value)">
-        <mat-option *ngFor="let option of options; let i = index" [value]="option"
-                    [class.highlighted]="i === highlightedIndex" (click)="onOptionClick(option, i)">
+      <mat-select #matSelect [formControl]="selectedValue">
+        <mat-option class="search-option" disabled>
+          <mat-icon>search</mat-icon>
+          <input #searchInput matInput placeholder="Search..." [formControl]="searchText" (input)="filterOptions()" autofocus>
+        </mat-option>
+        <mat-option *ngFor="let option of filteredOptions" [value]="option" (click)="onOptionClick(option)">
           {{ option }}
         </mat-option>
       </mat-select>
@@ -27,17 +31,26 @@ import { MatSelectModule } from '@angular/material/select';
     .dropdown-container {
       width: 200px;
     }
+    .search-option {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      pointer-events: none;
+    }
+    .search-option mat-icon {
+      margin-right: 8px;
+    }
+    .search-option input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+    }
     mat-option {
       max-width: 200px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-    }
-    .highlighted {
-      background-color: lightblue !important;
-    }
-    mat-select-panel {
-      max-height: 75vh;
     }
     `
   ]
@@ -245,62 +258,21 @@ export class CustomDropdownComponent implements OnInit {
     "Zambia",
     "Zimbabwe"
 ];
-  searchControl = new FormControl('No Work Team');
-  highlightedIndex: number = -1;
-  searchText: string = '';
-  searchTimeout: any;
+  selectedValue = new FormControl('');
+  searchText = new FormControl('');
+  filteredOptions: string[] = [];
 
   ngOnInit(): void {
     this.options.sort((a, b) => a.localeCompare(b)); // Sort options alphabetically
+    this.filteredOptions = [...this.options];
   }
 
-  onKeyPress(event: KeyboardEvent): void {    
-    const key = event.key.toLowerCase();
-    if (key.length === 1 && /[a-z]/.test(key)) {
-      clearTimeout(this.searchTimeout);
-      this.searchText += key;
-      this.highlightFirstMatch(this.searchText);
-      this.searchTimeout = setTimeout(() => this.searchText = '', 500); // Reset search text if no typing after 500ms
-    } else if (key === 'arrowdown') {
-      this.navigateOptions(1);
-    } else if (key === 'arrowup') {
-      this.navigateOptions(-1);
-    }
+  filterOptions(): void {
+    const search = this.searchText.value?.toLowerCase() || '';
+    this.filteredOptions = this.options.filter(opt => opt.toLowerCase().includes(search));
   }
 
-  highlightFirstMatch(search: string): void {   
-    const matches = this.options.filter(opt => opt.toLowerCase().includes(search));
-    if (matches.length) {
-      this.highlightedIndex = this.options.indexOf(matches[0]);
-      this.searchControl.setValue(matches[0]);
-    }
-  }
-
-  navigateOptions(step: number): void {
-    if (this.highlightedIndex === -1) return; // Ensure navigation starts from a highlighted value    
-    this.highlightedIndex = (this.highlightedIndex + step + this.options.length) % this.options.length;
-    this.searchControl.setValue(this.options[this.highlightedIndex]);
-  }
-
-  onOptionClick(option: string, index: number): void {
-    this.highlightedIndex = index;
-    this.searchControl.setValue(option);
-  }
-
-  onOptionClick1(option: any): void {    
-    const index = this.options.indexOf(option);
-  if (index !== -1) {
-    this.highlightedIndex = index;
-    this.searchControl.setValue(option);
-  }
-  }
-
-  @HostListener('document:click', ['$event'])
-  onClickOutside(event: Event): void {
-    if (!this.matSelect.panelOpen) {
-      this.searchControl.setValue('No Work Team'); // Reset to default text on close
-      this.highlightedIndex = -1;
-      this.searchText = '';
-    }
+  onOptionClick(option: string): void {
+    this.selectedValue.setValue(option);
   }
 }

@@ -7,7 +7,7 @@ import { MatOptionModule } from '@angular/material/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-dropdown005',
+  selector: 'app-dropdown006',
   standalone: true,
   imports: [CommonModule, MatSelectModule, MatFormFieldModule, MatInputModule, MatOptionModule, FormsModule],
   template: `
@@ -19,20 +19,23 @@ import { FormsModule } from '@angular/forms';
         <div class="search-container" (click)="$event.stopPropagation()">
           <input matInput placeholder="Search..." [(ngModel)]="searchText" (keydown)="$event.stopPropagation()" />
         </div>
-        <mat-option *ngFor="let option of filteredOptions()" [value]="option">
-          {{ option }}
-        </mat-option>
+        <div class="options-container">
+          <mat-option *ngFor="let option of filteredOptions()" [value]="option">
+            {{ option }}
+          </mat-option>
+        </div>
       </mat-select>
     </mat-form-field>
   `,
   styles: [
     `mat-form-field { width: 200px; }
-     .search-container { padding: 8px; display: flex; }
+     .search-container { padding: 8px; display: flex; position: sticky; top: 0; background: white; z-index: 2; }
      input { width: 100%; padding: 8px; box-sizing: border-box; }
-     .custom-panel .mat-mdc-select-panel { max-height: 75vh; width: 200px; }`
+     .custom-panel .mat-mdc-select-panel { max-height: 50vh; width: 200px; overflow-y: auto; display: flex; flex-direction: column; }
+     .options-container { flex-grow: 1; overflow-y: auto; }`
   ]
 })
-export class Dropdown005Component {
+export class Dropdown006Component {
   options: string[] = [
     "Afghanistan",
     "Albania",
@@ -236,7 +239,6 @@ export class Dropdown005Component {
   selectedValue: string = '';
 
   filteredOptions(): string[] {
-    const search = this.searchText?.toLowerCase() || '';
-    return this.options.filter(opt => opt.toLowerCase().startsWith(search));
+    return this.options.filter(option => option.toLowerCase().startsWith(this.searchText.toLowerCase()));
   }
 }
