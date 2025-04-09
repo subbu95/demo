@@ -30,8 +30,18 @@ describe('NavBarComponent', () => {
 
   const mockMenuResponse: MenuResponse = {
     [MenuKeys.LANGUAGE]: [
-      { lanCode: 'en', languageName: 'English' }
-    ]
+      { lanCode: 'en', url: 'string', languageName: 'English' }
+    ],
+    [MenuKeys.INSTRUCTIONS]: [{ menuItemName: 'Sub', url: 'string', children: [] }],
+    [MenuKeys.MADRAS]: { url: 'https://example.com' },
+    [MenuKeys.REFERENTIAL]: { url: 'https://example.com' },
+    [MenuKeys.DATASCOPES]: { url: 'https://example.com' },
+    [MenuKeys.DATA_MAINTENANCE]: { url: 'https://example.com' },
+    [MenuKeys.FOLLOW_UP]: { url: 'https://example.com' },
+    [MenuKeys.DEVELOPMENT]: [{ menuItemName: 'Sub', url: 'string', children: [] }],
+    [MenuKeys.ADMINISTRATION]: [{ menuItemName: 'Sub', url: 'string', children: [] }],
+    [MenuKeys.GUIDELINES]: [{ menuItemName: 'Sub', url: 'string', children: [] }],
+    [MenuKeys.POS]: { url: 'https://example.com' }
   };
 
   beforeEach(async () => {
@@ -117,22 +127,22 @@ describe('NavBarComponent', () => {
   });
 
   it('should redirect to external (others)', () => {
-    const mockItem: ExternalMenuItem = { url: 'https://example.com' };
+    const mockItem: SubMenuItem[] = [{ menuItemName: 'Sub', url: 'string', children: [] }];
     component.data[MenuKeys.ADMINISTRATION] = mockItem;
 
     component.redirectToExternal(MenuKeys.ADMINISTRATION);
-    expect(window.location.href).toBe(mockItem.url);
+    expect(window.location.href).toBe(mockItem[0].url);
   });
 
   it('should get language menu items', () => {
-    const items: LanguageMenuItem[] = [{ lanCode: 'en', languageName: 'English' }];
+    const items: LanguageMenuItem[] = [{ lanCode: 'en', url: 'string', languageName: 'English' }];
     component.data[MenuKeys.LANGUAGE] = items;
     const result = component.getLanguageMenuItems(MenuKeys.LANGUAGE);
     expect(result).toEqual(items);
   });
 
   it('should set language', () => {
-    const items: LanguageMenuItem[] = [{ lanCode: 'en', languageName: 'English' }];
+    const items: LanguageMenuItem[] = [{ lanCode: 'en', url: 'string', languageName: 'English' }];
     sessionStorageService.get.and.returnValue('john');
     component.data[MenuKeys.LANGUAGE] = items;
 
@@ -149,7 +159,7 @@ describe('NavBarComponent', () => {
 
   it('should open and close main menu', () => {
     const button = {} as any;
-    component.data[MenuKeys.LANGUAGE] = [{ lanCode: 'en', languageName: 'English' }];
+    component.data[MenuKeys.LANGUAGE] = [{ lanCode: 'en', url: 'string', languageName: 'English' }];
     component.openMainMenu(MenuKeys.LANGUAGE, button);
     expect(component.isDropdownOpen).toBeTrue();
 
@@ -158,8 +168,8 @@ describe('NavBarComponent', () => {
   });
 
   it('should open submenu', () => {
-    const child: MenuItem = { menuItemName: 'Sub', children: [] };
-    const item: MenuItem = { menuItemName: 'Main', children: [child] };
+    const child: MenuItem = { menuItemName: 'Sub', url: 'string', children: [] };
+    const item: MenuItem = { menuItemName: 'Main', url: 'string', children: [child] };
     component.currentMenu = [item];
 
     component.openSubmenu(item, 0);
@@ -168,7 +178,7 @@ describe('NavBarComponent', () => {
   });
 
   it('should go back in menu stack', () => {
-    const prevMenu: MenuItem[] = [{ menuItemName: 'Previous' }];
+    const prevMenu: MenuItem[] = [{ menuItemName: 'Previous', url: 'string', }];
     component.menuStack = [prevMenu];
     component.SelectedTitleStack = ['Main'];
     component.goBack();
@@ -176,7 +186,7 @@ describe('NavBarComponent', () => {
   });
 
   it('should navigate with keyboard events', () => {
-    component.currentMenu = [{ menuItemName: 'Test' }];
+    component.currentMenu = [{ menuItemName: 'Test', url: 'string', }];
     component.isDropdownOpen = true;
 
     const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
