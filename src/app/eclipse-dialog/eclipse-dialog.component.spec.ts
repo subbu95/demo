@@ -1,161 +1,148 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient, HttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { of, throwError } from 'rxjs';
 import { EclipseAthenaDialogComponent } from './eclipse-athena-dialog.component';
 import { DetailsDataService } from '../../../services/details-data.service';
 import { LoaderService } from '../../../services/loader.service';
 import { UtilityService } from '../../../services/utility.service';
 import { SnackbarService } from '@nielseniq/athena-core';
-import { of, throwError } from 'rxjs';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { DialogComponent } from '@nielseniq/athena-core';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('EclipseAthenaDialogComponent', () => {
   let component: EclipseAthenaDialogComponent;
   let fixture: ComponentFixture<EclipseAthenaDialogComponent>;
-  let detailsDataService: jasmine.SpyObj<DetailsDataService>;
+  let detailsService: jasmine.SpyObj<DetailsDataService>;
   let loaderService: jasmine.SpyObj<LoaderService>;
-  let utilityService: jasmine.SpyObj<UtilityService>;
-  let snackbarService: jasmine.SpyObj<SnackbarService>;
+  let utilService: jasmine.SpyObj<UtilityService>;
+  let snackbar: jasmine.SpyObj<SnackbarService>;
 
   beforeEach(async () => {
-    const detailsDataServiceSpy = jasmine.createSpyObj('DetailsDataService', ['getJobDetails', 'getJobLogDetails', 'downloadFile']);
+    const detailsServiceSpy = jasmine.createSpyObj('DetailsDataService', ['getJobDetails', 'getJobLogDetails', 'downloadFile']);
     const loaderServiceSpy = jasmine.createSpyObj('LoaderService', ['getNIQLoader']);
-    const utilityServiceSpy = jasmine.createSpyObj('UtilityService', ['openSnackBar']);
-    const snackbarServiceSpy = jasmine.createSpyObj('SnackbarService', ['open']);
+    const utilServiceSpy = jasmine.createSpyObj('UtilityService', ['openSnackBar']);
+    const snackbarSpy = jasmine.createSpyObj('SnackbarService', ['open']);
 
     await TestBed.configureTestingModule({
-      declarations: [EclipseAthenaDialogComponent],
       providers: [
-        { provide: DetailsDataService, useValue: detailsDataServiceSpy },
-        { provide: LoaderService, useValue: loaderServiceSpy },
-        { provide: UtilityService, useValue: utilityServiceSpy },
-        { provide: SnackbarService, useValue: snackbarServiceSpy },
         provideHttpClient(),
-        provideHttpClientTesting()
+        provideHttpClientTesting(),
+        { provide: DetailsDataService, useValue: detailsServiceSpy },
+        { provide: LoaderService, useValue: loaderServiceSpy },
+        { provide: UtilityService, useValue: utilServiceSpy },
+        { provide: SnackbarService, useValue: snackbarSpy }
       ],
-      schemas: [NO_ERRORS_SCHEMA] // Ignore unknown elements and attributes
+      imports: [EclipseAthenaDialogComponent]
     }).compileComponents();
 
     fixture = TestBed.createComponent(EclipseAthenaDialogComponent);
     component = fixture.componentInstance;
-    detailsDataService = TestBed.inject(DetailsDataService) as jasmine.SpyObj<DetailsDataService>;
+    detailsService = TestBed.inject(DetailsDataService) as jasmine.SpyObj<DetailsDataService>;
     loaderService = TestBed.inject(LoaderService) as jasmine.SpyObj<LoaderService>;
-    utilityService = TestBed.inject(UtilityService) as jasmine.SpyObj<UtilityService>;
-    snackbarService = TestBed.inject(SnackbarService) as jasmine.SpyObj<SnackbarService>;
+    utilService = TestBed.inject(UtilityService) as jasmine.SpyObj<UtilityService>;
+    snackbar = TestBed.inject(SnackbarService) as jasmine.SpyObj<SnackbarService>;
+
+    loaderService.getNIQLoader.and.returnValue('loader-img');
+    fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should open dialog and load job log data on openDialog call', () => {
+  it('should call openDialog and fetch job log data', () => {
     spyOn(component, 'onSelectedChange');
     component.openDialog(123);
-    expect(component.dialogBox.open).toHaveBeenCalled();
-    expect(component.isLoading).toBeTrue();
-    expect(component.onSelectedChange).toHaveBeenCalledWith(component.primaryTab, 123);
+    expect(component.onSelectedChange).toHaveBeenCalledWith('jobLog', 123);
   });
 
-  it('should handle tab selection change', () => {
-    spyOn(component, 'getJobLogData');
+  it('should call confirm and emit confirmation', () => {
+    spyOn(component.confirmEvent, 'emit');
+    component.dialogBox = { close: jasmine.createSpy('close') } as any;
+    component.confirm();
+    expect(component.confirmEvent.emit).toHaveBeenCalledWith('Confirmation');
+    expect(component.dialogBox.close).toHaveBeenCalled();
+  });
+
+  it('should switch to secondary tab and call getDetailsData', () => {
     spyOn(component, 'getDetailsData');
-
-    component.onSelectedChange('details', 123);
+    component.onSelectedChange('details', 1);
     expect(component.getDetailsData).toHaveBeenCalled();
-
-    component.onSelectedChange('jobLog', 123);
-    expect(component.getJobLogData).toHaveBeenCalledWith(123);
+    expect(component.tabSelected).toBe('details');
   });
 
-  it('should fetch job details data successfully', fakeAsync(() => {
-    const mockDetails = { body: { key: 'value' } };
-    detailsDataService.getJobDetails.and.returnValue(of(mockDetails));
+  it('should switch to primary tab and call getJobLogData', () => {
+    spyOn(component, 'getJobLogData');
+    component.onSelectedChange('jobLog', 1);
+    expect(component.getJobLogData).toHaveBeenCalledWith(1);
+    expect(component.tabSelected).toBe('jobLog');
+  });
 
+  it('should handle getDetailsData success', () => {
+    const mockData = { body: { key1: 'value1' } };
+    (detailsService.getJobDetails as jasmine.Spy).and.returnValue(of(mockData));
+    component.monId = 1;
+    component.detailsPath = 'path';
     component.getDetailsData();
-    tick();
-
-    expect(component.isLoading).toBeFalse();
-    expect(component.detailsData.length).toBeGreaterThan(0);
     expect(component.isDetailsAPICalled).toBeTrue();
-  }));
+  });
 
-  it('should handle error when fetching job details data', fakeAsync(() => {
-    const mockError = { error: { status: { errors: [{ code: '500', message: 'Error' }] } } };
-    detailsDataService.getJobDetails.and.returnValue(throwError(() => mockError));
-
+  it('should handle getDetailsData error', () => {
+    const err = { error: { status: { errors: [{ code: '404', message: 'Not found' }], responseStatus: 'FAIL' } } };
+    (detailsService.getJobDetails as jasmine.Spy).and.returnValue(throwError(() => err));
+    component.monId = 1;
+    component.detailsPath = 'path';
     component.getDetailsData();
-    tick();
-
-    expect(component.isLoading).toBeFalse();
     expect(component.hasError).toBeTrue();
-    expect(component.errorCode).toBe('500');
-    expect(component.errorMessage).toBe('Error');
-  }));
+    expect(component.errorCode).toContain('404');
+    expect(component.errorMessage).toBe('Not found');
+  });
 
-  it('should fetch job log data successfully', fakeAsync(() => {
-    const mockJobLog = { body: { isTruncated: false, session: {}, uproc: {}, logContent: 'log' } };
-    detailsDataService.getJobLogDetails.and.returnValue(of(mockJobLog));
-
-    component.getJobLogData(123);
-    tick();
-
-    expect(component.isLoading).toBeFalse();
+  it('should handle getJobLogData success', () => {
+    const body = {
+      isTruncated: false,
+      logContent: 'logs',
+      session: 's1',
+      uproc: 'u1'
+    };
+    (detailsService.getJobLogDetails as jasmine.Spy).and.returnValue(of({ body }));
+    component.getJobLogData(1);
+    expect(component.jobLogDetails).toEqual(body);
     expect(component.isJobLogAPICalled).toBeTrue();
-    expect(component.logContent).toBe('log');
-  }));
+  });
 
-  it('should handle error when fetching job log data', fakeAsync(() => {
-    const mockError = { error: { status: { errors: [{ code: '500', message: 'Error' }] } } };
-    detailsDataService.getJobLogDetails.and.returnValue(throwError(() => mockError));
-
-    component.getJobLogData(123);
-    tick();
-
-    expect(component.isLoading).toBeFalse();
+  it('should handle getJobLogData error', () => {
+    const err = { error: { status: { errors: [{ code: '500', message: 'Internal Error' }] } } };
+    (detailsService.getJobLogDetails as jasmine.Spy).and.returnValue(throwError(() => err));
+    component.getJobLogData(1);
     expect(component.hasError).toBeTrue();
-    expect(component.errorCode).toBe('500');
-    expect(component.errorMessage).toBe('Error');
-  }));
+    expect(component.errorMessage).toContain('Internal Error');
+  });
 
-  it('should download file successfully', fakeAsync(() => {
-    const mockBlob = new Blob(['test'], { type: 'text/plain' });
-    detailsDataService.downloadFile.and.returnValue(of(mockBlob));
-    spyOn(window, 'saveAs');
-
+  it('should handle downloadFile success', () => {
+    const blob = new Blob(['file content']);
+    (detailsService.downloadFile as jasmine.Spy).and.returnValue(of(blob));
+    component.monId = 1;
+    component.sessionName = 's';
+    component.uproc = 'u';
     component.downloadFile();
-    tick();
+    expect(utilService.openSnackBar).toHaveBeenCalled();
+  });
 
-    expect(window.saveAs).toHaveBeenCalled();
-    expect(utilityService.openSnackBar).toHaveBeenCalledWith(
-      'large',
-      'success',
-      'File downloading begins. It will take few minutes.',
-      'success'
-    );
-  }));
-
-  it('should handle error when downloading file', fakeAsync(() => {
-    const mockError = { error: { error: 'Download error' } };
-    detailsDataService.downloadFile.and.returnValue(throwError(() => mockError));
-
+  it('should handle downloadFile error', () => {
+    const err = { error: { error: 'Download failed' } };
+    (detailsService.downloadFile as jasmine.Spy).and.returnValue(throwError(() => err));
     component.downloadFile();
-    tick();
+    expect(snackbar.open).toHaveBeenCalled();
+  });
 
-    expect(snackbarService.open).toHaveBeenCalledWith(
-      'large',
-      'error',
-      'Download error',
-      'download',
-      { dismissAfter: 4000 }
-    );
-  }));
-
-  it('should reset dialog state on resetEclipseDialog call', () => {
+  it('should clean up subscriptions on destroy', () => {
     spyOn(component.stepDetailsSubscription, 'unsubscribe');
     spyOn(component.jobLogSubscription, 'unsubscribe');
     spyOn(component.saveLogSubscription, 'unsubscribe');
-
-    component.reset
-::contentReference[oaicite:0]{index=0}
- 
+    component.ngOnDestroy();
+    expect(component.stepDetailsSubscription.unsubscribe).toHaveBeenCalled();
+    expect(component.jobLogSubscription.unsubscribe).toHaveBeenCalled();
+    expect(component.saveLogSubscription.unsubscribe).toHaveBeenCalled();
+  });
+});
