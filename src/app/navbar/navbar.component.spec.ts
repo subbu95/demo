@@ -45,7 +45,7 @@ describe('NavBarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [NavBarComponent],
+      imports: [NavBarComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         { provide: MenuService, useValue: jasmine.createSpyObj('MenuService', ['getMenus']) },
@@ -184,5 +184,118 @@ describe('NavBarComponent', () => {
     const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
     component.navigate(event);
     expect(component.activeIndex).toBe(0);
+  });
+  // Additional tests for navigateToLegacyUrl
+  it('should navigate to legacy URL using navigateToLegacyUrl()', () => {
+    const mockUrl = 'https://legacy.example.com';
+    const openSpy = spyOn(window, 'open');
+    component.navigateToLegacyUrl(mockUrl);
+    expect(openSpy).toHaveBeenCalledOnceWith(mockUrl, '_blank');
+  });
+
+  it('should not attempt navigation if legacy URL is undefined', () => {
+    const openSpy = spyOn(window, 'open');
+    component.navigateToLegacyUrl(undefined as any);
+    expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not attempt navigation if legacy URL is null', () => {
+    const openSpy = spyOn(window, 'open');
+    component.navigateToLegacyUrl(null as any);
+    expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not attempt navigation if legacy URL is empty string', () => {
+    const openSpy = spyOn(window, 'open');
+    component.navigateToLegacyUrl('');
+    expect(openSpy).not.toHaveBeenCalled();
+  });
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should navigate to legacy URL', () => {
+    const openSpy = spyOn(window, 'open');
+    const url = 'https://example.com';
+    component.navigateToLegacyUrl(url);
+    expect(openSpy).toHaveBeenCalledWith(url, '_blank');
+  });
+
+  it('should not navigate if legacy URL is undefined/null/empty', () => {
+    const openSpy = spyOn(window, 'open');
+    component.navigateToLegacyUrl(undefined as any);
+    component.navigateToLegacyUrl(null as any);
+    component.navigateToLegacyUrl('');
+    expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  it('should call getMenuData on init', () => {
+    menuService.getMenus.and.returnValue(of({} as MenuResponse));
+    component.ngOnInit();
+    expect(menuService.getMenus).toHaveBeenCalled();
+  });
+
+  it('should handle getMenuData error', () => {
+    menuService.getMenus.and.returnValue(throwError(() => new Error('error')));
+    component.ngOnInit();
+    expect(utilityService.openSnackBar).toHaveBeenCalled();
+  });
+
+  it('should set language and reload page', () => {
+    spyOn(window.location, 'reload');
+    const lang = { lanCode: 'fr' };
+    component.setLanguage(lang);
+    expect(cookieService.set).toHaveBeenCalled();
+    expect(window.location.reload).toHaveBeenCalled();
+  });
+
+  it('should handle global keyboard Escape key', () => {
+    const mockEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+    component.isDropdownOpen = true;
+    component.handleGlobalKeyboard(mockEvent);
+    expect(component.isDropdownOpen).toBeFalse();
+  });
+
+  it('should navigate with keyboard events', () => {
+    component.currentMenu = [{ menuItemName: 'Test', url: 'url' }];
+    component.activeIndex = 0;
+    const mockEvent = new KeyboardEvent('keydown', { key: 'Enter' });
+    spyOn(component, 'navigateToLegacyUrl');
+    component.handleGlobalKeyboard(mockEvent);
+    expect(component.navigateToLegacyUrl).toHaveBeenCalled();
+  });
+
+  it('should open submenu', () => {
+    const menu = { children: [{}], menuItemName: 'Test' } as any;
+    component.openSubMenu(menu, 0);
+    expect(component.menuStack.length).toBe(1);
+    expect(component.selectedMenuTitle).toBe('Test');
+  });
+
+  it('should reset menu', () => {
+    component.resetMenu();
+    expect(component.menuStack.length).toBe(0);
+    expect(component.SelectedTitleStack.length).toBe(0);
+  });
+
+  it('should go back in menu stack', () => {
+    component.menuStack.push([{}]);
+    component.SelectedTitleStack.push('Prev');
+    component.goBack();
+    expect(component.menuStack.length).toBe(0);
+    expect(component.SelectedTitleStack.length).toBe(0);
+  });
+
+  it('should open and close main menu', () => {
+    component.toggleMainMenu();
+    expect(component.isDropdownOpen).toBeTrue();
+    component.toggleMainMenu();
+    expect(component.isDropdownOpen).toBeFalse();
+  });
+
+  it('should unsubscribe on destroy', () => {
+    const unsubSpy = spyOn(component.subscription, 'unsubscribe');
+    component.ngOnDestroy();
+    expect(unsubSpy).toHaveBeenCalled();
   });
 });
