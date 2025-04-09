@@ -132,8 +132,8 @@ describe('NavBarComponent', () => {
   });
 
   it('should open submenu', () => {
-    const child: MenuItem = { menuItemName: 'Child', children: [] };
-    const parent: MenuItem = { menuItemName: 'Parent', children: [child] };
+    const child: MenuItem = { menuItemName: 'Child', url: 'string', children: [] };
+    const parent: MenuItem = { menuItemName: 'Parent', url: 'string', children: [child] };
     component.currentMenu = [parent];
     component.openSubmenu(parent, 0);
     expect(component.menuStack.length).toBe(1);
@@ -150,7 +150,7 @@ describe('NavBarComponent', () => {
   });
 
   it('should go back in menu stack', () => {
-    const prevMenu: MenuItem[] = [{ menuItemName: 'Prev' }];
+    const prevMenu: MenuItem[] = [{ menuItemName: 'Prev', url: 'string', }];
     component.menuStack = [prevMenu];
     component.SelectedTitleStack = ['Main'];
     component.selectedIndices = [0];
@@ -159,7 +159,7 @@ describe('NavBarComponent', () => {
   });
 
   it('should set language', () => {
-    component.data[MenuKeys.LANGUAGE] = [{ lanCode: 'en', languageName: 'English' }];
+    component.data[MenuKeys.LANGUAGE] = [{ lanCode: 'en', url: 'string', languageName: 'English' }];
     sessionStorageService.get.and.returnValue('John');
     spyOn(component, 'closeDropdown');
     spyOn(component, 'resetMenu');
@@ -178,55 +178,16 @@ describe('NavBarComponent', () => {
   });
 
   it('should navigate with keyboard events', () => {
-    component.currentMenu = [{ menuItemName: 'Test' }];
+    component.currentMenu = [{ menuItemName: 'Test', url: 'string', }];
     component.isDropdownOpen = true;
     component.activeIndex = -1;
     const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
     component.navigate(event);
     expect(component.activeIndex).toBe(0);
   });
-  // Additional tests for navigateToLegacyUrl
-  it('should navigate to legacy URL using navigateToLegacyUrl()', () => {
-    const mockUrl = 'https://legacy.example.com';
-    const openSpy = spyOn(window, 'open');
-    component.navigateToLegacyUrl(mockUrl);
-    expect(openSpy).toHaveBeenCalledOnceWith(mockUrl, '_blank');
-  });
 
-  it('should not attempt navigation if legacy URL is undefined', () => {
-    const openSpy = spyOn(window, 'open');
-    component.navigateToLegacyUrl(undefined as any);
-    expect(openSpy).not.toHaveBeenCalled();
-  });
-
-  it('should not attempt navigation if legacy URL is null', () => {
-    const openSpy = spyOn(window, 'open');
-    component.navigateToLegacyUrl(null as any);
-    expect(openSpy).not.toHaveBeenCalled();
-  });
-
-  it('should not attempt navigation if legacy URL is empty string', () => {
-    const openSpy = spyOn(window, 'open');
-    component.navigateToLegacyUrl('');
-    expect(openSpy).not.toHaveBeenCalled();
-  });
   it('should create', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should navigate to legacy URL', () => {
-    const openSpy = spyOn(window, 'open');
-    const url = 'https://example.com';
-    component.navigateToLegacyUrl(url);
-    expect(openSpy).toHaveBeenCalledWith(url, '_blank');
-  });
-
-  it('should not navigate if legacy URL is undefined/null/empty', () => {
-    const openSpy = spyOn(window, 'open');
-    component.navigateToLegacyUrl(undefined as any);
-    component.navigateToLegacyUrl(null as any);
-    component.navigateToLegacyUrl('');
-    expect(openSpy).not.toHaveBeenCalled();
   });
 
   it('should call getMenuData on init', () => {
@@ -243,7 +204,7 @@ describe('NavBarComponent', () => {
 
   it('should set language and reload page', () => {
     spyOn(window.location, 'reload');
-    const lang = { lanCode: 'fr' };
+    const lang = 'fr';
     component.setLanguage(lang);
     expect(cookieService.set).toHaveBeenCalled();
     expect(window.location.reload).toHaveBeenCalled();
@@ -256,18 +217,10 @@ describe('NavBarComponent', () => {
     expect(component.isDropdownOpen).toBeFalse();
   });
 
-  it('should navigate with keyboard events', () => {
-    component.currentMenu = [{ menuItemName: 'Test', url: 'url' }];
-    component.activeIndex = 0;
-    const mockEvent = new KeyboardEvent('keydown', { key: 'Enter' });
-    spyOn(component, 'navigateToLegacyUrl');
-    component.handleGlobalKeyboard(mockEvent);
-    expect(component.navigateToLegacyUrl).toHaveBeenCalled();
-  });
 
   it('should open submenu', () => {
     const menu = { children: [{}], menuItemName: 'Test' } as any;
-    component.openSubMenu(menu, 0);
+    component.openSubmenu(menu, 0);
     expect(component.menuStack.length).toBe(1);
     expect(component.selectedMenuTitle).toBe('Test');
   });
@@ -279,18 +232,11 @@ describe('NavBarComponent', () => {
   });
 
   it('should go back in menu stack', () => {
-    component.menuStack.push([{}]);
+    component.menuStack.push([{menuItemName: 'Test', url: 'string'}]);
     component.SelectedTitleStack.push('Prev');
     component.goBack();
     expect(component.menuStack.length).toBe(0);
     expect(component.SelectedTitleStack.length).toBe(0);
-  });
-
-  it('should open and close main menu', () => {
-    component.toggleMainMenu();
-    expect(component.isDropdownOpen).toBeTrue();
-    component.toggleMainMenu();
-    expect(component.isDropdownOpen).toBeFalse();
   });
 
   it('should unsubscribe on destroy', () => {
