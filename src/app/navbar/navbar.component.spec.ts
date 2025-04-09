@@ -61,6 +61,8 @@ describe('NavBarComponent', () => {
 
     fixture = TestBed.createComponent(NavBarComponent);
     component = fixture.componentInstance;
+    component.data = {};
+    component.subscription = { unsubscribe: () => {} } as any;
 
     menuService = TestBed.inject(MenuService) as jasmine.SpyObj<MenuService>;
     sharedService = TestBed.inject(SharedService) as jasmine.SpyObj<SharedService>;
@@ -180,6 +182,7 @@ describe('NavBarComponent', () => {
   it('should go back in menu stack', () => {
     const prevMenu: MenuItem[] = [{ menuItemName: 'Previous', url: 'string', }];
     component.menuStack = [prevMenu];
+    component.SelectedTitleStack = ['Main'];
     component.SelectedTitleStack = ['Main'];
     component.goBack();
     expect(component.currentMenu).toEqual(prevMenu);
