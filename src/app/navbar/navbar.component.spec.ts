@@ -244,4 +244,106 @@ describe('NavBarComponent', () => {
     component.ngOnDestroy();
     expect(unsubSpy).toHaveBeenCalled();
   });
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should navigate to legacy URL', () => {
+    const openSpy = spyOn(window, 'open');
+    const url = 'https://example.com';
+    component.navigateToLegacyUrl(url);
+    expect(openSpy).toHaveBeenCalledWith(url, '_blank');
+  });
+
+  it('should not navigate if legacy URL is undefined/null/empty', () => {
+    const openSpy = spyOn(window, 'open');
+    component.navigateToLegacyUrl(undefined as any);
+    component.navigateToLegacyUrl(null as any);
+    component.navigateToLegacyUrl('');
+    expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  it('should call getMenuData on init', () => {
+    menuService.getMenus.and.returnValue(of({} as MenuResponse));
+    component.ngOnInit();
+    expect(menuService.getMenus).toHaveBeenCalled();
+  });
+
+  it('should handle getMenuData error', () => {
+    menuService.getMenus.and.returnValue(throwError(() => new Error('error')));
+    component.ngOnInit();
+    expect(utilityService.openSnackBar).toHaveBeenCalledWith('Unable to load menu', true);
+  });
+
+  it('should set language and reload page', () => {
+    spyOn(window.location, 'reload');
+    const lang = { lanCode: 'fr' };
+    component.setLanguage(lang);
+    expect(cookieService.set).toHaveBeenCalledWith('langCode', 'fr');
+    expect(window.location.reload).toHaveBeenCalled();
+  });
+
+  it('should handle global keyboard Escape key', () => {
+    const mockEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+    component.isDropdownOpen = true;
+    component.handleGlobalKeyboard(mockEvent);
+    expect(component.isDropdownOpen).toBeFalse();
+  });
+
+  it('should navigate with Enter key if URL exists', () => {
+    const mockEvent = new KeyboardEvent('keydown', { key: 'Enter' });
+    component.activeIndex = 0;
+    component.currentMenu = [{ menuItemName: 'Test', url: 'http://test.com' }];
+    spyOn(component, 'navigateToLegacyUrl');
+    component.handleGlobalKeyboard(mockEvent);
+    expect(component.navigateToLegacyUrl).toHaveBeenCalledWith('http://test.com');
+  });
+
+  it('should not navigate with Enter key if URL is missing', () => {
+    const mockEvent = new KeyboardEvent('keydown', { key: 'Enter' });
+    component.activeIndex = 0;
+    component.currentMenu = [{}];
+    spyOn(component, 'navigateToLegacyUrl');
+    component.handleGlobalKeyboard(mockEvent);
+    expect(component.navigateToLegacyUrl).not.toHaveBeenCalled();
+  });
+
+  it('should open submenu', () => {
+    const menu = { children: [{}], menuItemName: 'Test' } as any;
+    component.openSubMenu(menu, 0);
+    expect(component.menuStack.length).toBe(1);
+    expect(component.selectedMenuTitle).toBe('Test');
+    expect(component.activeIndex).toBe(-1);
+  });
+
+  it('should reset menu', () => {
+    component.menuStack = [[{}]];
+    component.SelectedTitleStack = ['title'];
+    component.resetMenu();
+    expect(component.menuStack.length).toBe(0);
+    expect(component.SelectedTitleStack.length).toBe(0);
+  });
+
+  it('should go back in menu stack', () => {
+    component.menuStack = [[{}]];
+    component.SelectedTitleStack = ['title'];
+    component.goBack();
+    expect(component.menuStack.length).toBe(0);
+    expect(component.SelectedTitleStack.length).toBe(0);
+    expect(component.selectedMenuTitle).toBe('Main Menu');
+  });
+
+  it('should toggle main menu open and close', () => {
+    component.isDropdownOpen = false;
+    component.toggleMainMenu();
+    expect(component.isDropdownOpen).toBeTrue();
+    component.toggleMainMenu();
+    expect(component.isDropdownOpen).toBeFalse();
+  });
+
+  it('should unsubscribe on destroy', () => {
+    const spyUnsub = spyOn(component.subscription, 'unsubscribe');
+    component.ngOnDestroy();
+    expect(spyUnsub).toHaveBeenCalled();
+  });
 });
