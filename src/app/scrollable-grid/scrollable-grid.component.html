@@ -1,0 +1,53 @@
+<div class="table-wrapper">
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z1 mat-table-fixed">
+  
+      <!-- Sticky First Column -->
+      <ng-container matColumnDef="options">
+        <th mat-header-cell *matHeaderCellDef sticky stickyStart class="z-top">Options</th>
+        <td mat-cell *matCellDef="let row" stickyStart>
+          <button mat-icon-button [matMenuTriggerFor]="menu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item>Action 1</button>
+            <button mat-menu-item>Action 2</button>
+          </mat-menu>
+        </td>
+      </ng-container>
+  
+      <!-- Other Columns -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef sticky> ID </th>
+        <td mat-cell *matCellDef="let row"> {{ row.id }} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef sticky> Description </th>
+        <td mat-cell *matCellDef="let row"> {{ row.description }} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="workteam">
+        <th mat-header-cell *matHeaderCellDef sticky> Workteam </th>
+        <td mat-cell *matCellDef="let row"> {{ row.workteam }} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="country">
+        <th mat-header-cell *matHeaderCellDef sticky> Country </th>
+        <td mat-cell *matCellDef="let row"> {{ row.country }} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="lastUpdatedBy">
+        <th mat-header-cell *matHeaderCellDef sticky> Last Updated By </th>
+        <td mat-cell *matCellDef="let row"> {{ row.lastUpdatedBy }} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="updatedDate">
+        <th mat-header-cell *matHeaderCellDef sticky> Updated Date </th>
+        <td mat-cell *matCellDef="let row"> {{ row.updatedDate }} </td>
+      </ng-container>
+  
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+  

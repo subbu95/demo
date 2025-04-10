@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { ScrollableGridComponent } from './scrollable-grid/scrollable-grid.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [ScrollableGridComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

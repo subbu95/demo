@@ -1,0 +1,24 @@
+.table-container {
+  height: 400px; /* vertical scroll height */
+  overflow: auto;
+}
+
+/* Optional: thin scrollbar styling */
+.table-container::-webkit-scrollbar {
+  height: 4px;
+  width: 4px;
+}
+.table-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Make table wide enough to scroll horizontally */
+.full-width-table {
+  min-width: 1200px;
+}
+
+/* Top-left cell should sit on top of everything */
+.z-top {
+  z-index: 100 !important;
+  background: #fff;
+}
