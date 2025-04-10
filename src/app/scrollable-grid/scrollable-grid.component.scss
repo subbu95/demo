@@ -1,24 +1,22 @@
 .table-container {
-  height: 400px; /* vertical scroll height */
+  height: 400px;
   overflow: auto;
 }
 
-/* Optional: thin scrollbar styling */
 .table-container::-webkit-scrollbar {
-  height: 4px;
   width: 4px;
-}
-.table-container::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.3);
+  height: 4px;
 }
 
-/* Make table wide enough to scroll horizontally */
-.full-width-table {
+.table-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.mat-table-scroll {
   min-width: 1200px;
 }
 
-/* Top-left cell should sit on top of everything */
 .z-top {
-  z-index: 100 !important;
-  background: #fff;
+  z-index: 100;
+  background: white;
 }

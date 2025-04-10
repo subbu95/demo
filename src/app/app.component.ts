@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { ScrollableGridComponent } from './scrollable-grid/scrollable-grid.component';
+import { StickyTableComponent } from './sticky-table/sticky-table.component';
 
 @Component({
   selector: 'app-root',
-  imports: [ScrollableGridComponent],
+  imports: [StickyTableComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
