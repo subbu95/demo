@@ -356,3 +356,143 @@ describe('NavBarComponent', () => {
     });
   });
 });
+
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { NavBarComponent } from './nav-bar.component';
+import { MenuService } from '../../services/menu.service';
+import { SharedService } from '../../services/shared.service';
+import { SessionStorageService } from '../../services/session-storage.service';
+import { LoaderService } from '../../services/loader.service';
+import { CookieService } from 'ngx-cookie-service';
+import { UtilityService } from '../../services/utility.service';
+import { Router } from '@angular/router';
+import { LegacyComponentService } from '../../services/legacy-component.service';
+import { MenuKeys } from '../../models/common/menu-model';
+import { SessionKeys } from '../../models/common/login-model';
+import { of, throwError } from 'rxjs';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { TruncatePipe } from '../../shared/pipe/truncate.pipe';
+import { OverlayModule } from '@angular/cdk/overlay';
+import { CommonModule } from '@angular/common';
+import { IconModule, ItemModule, MenuModule, TabModule, TooltipModule } from '@nielseniq/athena-core';
+import { MenuResponse } from '../../models/common/menu-model';
+
+describe('NavBarComponent', () => {
+  let component: NavBarComponent;
+  let fixture: ComponentFixture<NavBarComponent>;
+  let mockMenuService: jasmine.SpyObj<MenuService>;
+  let mockSharedService: jasmine.SpyObj<SharedService>;
+  let mockSessionStorageService: jasmine.SpyObj<SessionStorageService>;
+  let mockLoaderService: jasmine.SpyObj<LoaderService>;
+  let mockCookieService: jasmine.SpyObj<CookieService>;
+  let mockUtilityService: jasmine.SpyObj<UtilityService>;
+  let mockRouter: jasmine.SpyObj<Router>;
+  let mockLegacyComponentService: jasmine.SpyObj<LegacyComponentService>;
+
+  beforeEach(async () => {
+    mockMenuService = jasmine.createSpyObj('MenuService', ['getMenus', 'getInstructionMenu']);
+    mockSharedService = jasmine.createSpyObj('SharedService', ['updateInstructionsMenu', 'userLogout']);
+    mockSessionStorageService = jasmine.createSpyObj('SessionStorageService', ['get', 'set', 'clear']);
+    mockLoaderService = jasmine.createSpyObj('LoaderService', ['showLoader', 'hideLoader']);
+    mockCookieService = jasmine.createSpyObj('CookieService', ['set']);
+    mockUtilityService = jasmine.createSpyObj('UtilityService', ['openSnackBar']);
+    mockRouter = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl']);
+    mockLegacyComponentService = jasmine.createSpyObj('LegacyComponentService', [], { 
+      message$: of(false),
+      legacyUrl: { next: jasmine.createSpy() }
+    });
+
+    await TestBed.configureTestingModule({
+      imports: [
+        CommonModule,
+        OverlayModule,
+        IconModule,
+        TabModule,
+        MenuModule,
+        ItemModule,
+        TooltipModule,
+        NavBarComponent,
+        TruncatePipe
+      ],
+      providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+        { provide: MenuService, useValue: mockMenuService },
+        { provide: SharedService, useValue: mockSharedService },
+        { provide: SessionStorageService, useValue: mockSessionStorageService },
+        { provide: LoaderService, useValue: mockLoaderService },
+        { provide: CookieService, useValue: mockCookieService },
+        { provide: UtilityService, useValue: mockUtilityService },
+        { provide: Router, useValue: mockRouter },
+        { provide: LegacyComponentService, useValue: mockLegacyComponentService }
+      ]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(NavBarComponent);
+    component = fixture.componentInstance;
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  describe('ngOnInit', () => {
+    it('should call getMenuData on initialization', () => {
+      spyOn(component, 'getMenuData');
+      component.ngOnInit();
+      expect(component.getMenuData).toHaveBeenCalled();
+    });
+  });
+
+  describe('getMenuData', () => {
+    it('should fetch menu data successfully', fakeAsync(() => {
+      const mockMenuResponse: MenuResponse = {
+        [MenuKeys.INSTRUCTIONS]: [{ menuItemName: 'Test', url: '/test' }],
+        [MenuKeys.LANGUAGE]: [{ languageName: 'English', url: '', lanCode: 'en' }],
+        [MenuKeys.MADRAS]: { url: '' },
+        [MenuKeys.REFERENTIAL]: { url: '' },
+        [MenuKeys.DATASCOPES]: { url: '' },
+        [MenuKeys.DATA_MAINTENANCE]: { url: '' },
+        [MenuKeys.FOLLOW_UP]: { url: '' },
+        [MenuKeys.DEVELOPMENT]: [],
+        [MenuKeys.ADMINISTRATION]: [],
+        [MenuKeys.GUIDELINES]: [],
+        [MenuKeys.POS]: { url: '' }
+      };
+      
+      mockMenuService.getMenus.and.returnValue(of(mockMenuResponse));
+      mockSessionStorageService.get.and.returnValue('en');
+      
+      component.getMenuData();
+      tick();
+      
+      expect(mockLoaderService.showLoader).toHaveBeenCalled();
+      expect(mockMenuService.getMenus).toHaveBeenCalled();
+      expect(mockSessionStorageService.get).toHaveBeenCalledWith(SessionKeys.LANGUAGE_CODE);
+      expect(component.data).toEqual(mockMenuResponse);
+      expect(component.selectedLanguage).toBe('English');
+      expect(mockLoaderService.hideLoader).toHaveBeenCalled();
+    }));
+
+    it('should handle error when fetching menu data', fakeAsync(() => {
+      const errorResponse = { error: { message: 'Error fetching menus' } };
+      mockMenuService.getMenus.and.returnValue(throwError(() => errorResponse));
+      
+      component.getMenuData();
+      tick();
+      
+      expect(mockLoaderService.showLoader).toHaveBeenCalled();
+      expect(mockMenuService.getMenus).toHaveBeenCalled();
+      expect(mockUtilityService.openSnackBar).toHaveBeenCalledWith(
+        'large', 
+        'error', 
+        'Error fetching menus', 
+        'alert'
+      );
+      expect(mockLoaderService.hideLoader).toHaveBeenCalled();
+    }));
+  });
+
+  // ... rest of the test cases remain the same ...
+});
