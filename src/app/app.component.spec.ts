@@ -26,41 +26,227 @@ describe('AppComponent', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('h1')?.textContent).toContain('Hello, demo');
   });
-  Error: src/app/layout/nav-bar/nav-bar.component.spec.ts:95:48 - error TS2345: Argument of type 'Observable<{ Instructions: { menuItemName: string; url: string; }[]; Language: { languageName: string; url: string; lanCode: string; }[]; }>' is not assignable to parameter of type 'Observable<MenuResponse>'.
-  Type '{ Instructions: { menuItemName: string; url: string; }[]; Language: { languageName: string; url: string; lanCode: string; }[]; }' is missing the following properties from type 'MenuResponse': [MenuKeys.MADRAS], [MenuKeys.REFERENTIAL], [MenuKeys.DATASCOPES], [MenuKeys.DATA_MAINTENANCE], and 5 more.
+   NavBarComponent ngOnDestroy should unsubscribe from subscriptions FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
 
-95       mockMenuService.getMenus.and.returnValue(of(mockMenuResponse));
-                                                  ~~~~~~~~~~~~~~~~~~~~
+   NavBarComponent should create FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
 
+   NavBarComponent getMenuData should handle error when fetching menu data FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
 
-Error: src/app/layout/nav-bar/nav-bar.component.spec.ts:152:45 - error TS2345: Argument of type 'SubMenuItem[] | undefined' is not assignable to parameter of type 'Expected<ArrayLike<MenuItem>> | ArrayContaining<MenuItem>'.
-  Type 'undefined' is not assignable to type 'Expected<ArrayLike<MenuItem>> | ArrayContaining<MenuItem>'.
+  NavBarComponent getMenuData should fetch menu data successfully FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+   NavBarComponent Menu Navigation should open language menu FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+            at NodeInjectorFactory.factory (ng:///NavBarComponent/ɵfac.js:4:10)
+            at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:5984:44)
+            at createRootComponent (node_modules/@angular/core/fesm2022/core.mjs:15998:35)
+            at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:15858:29)
+            at apply (node_modules/@angular/core/fesm2022/testing.mjs:1979:51)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+            at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:14882:33)
 
-152       expect(component.currentMenu).toEqual(component.data[MenuKeys.INSTRUCTIONS]);
-                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   NavBarComponent Menu Navigation should toggle dropdown when opening same menu FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
 
+   NavBarComponent Menu Navigation should open submenu FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
 
-Error: src/app/layout/nav-bar/nav-bar.component.spec.ts:162:53 - error TS2345: Argument of type 'LanguageMenuItem[] | undefined' is not assignable to parameter of type 'Expected<ArrayLike<LanguageMenuItem>> | ArrayContaining<LanguageMenuItem>'.
-  Type 'undefined' is not assignable to type 'Expected<ArrayLike<LanguageMenuItem>> | ArrayContaining<LanguageMenuItem>'.
-
-162       expect(component.currentLanguageMenu).toEqual(component.data[MenuKeys.LANGUAGE]);
-                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-Error: src/app/layout/nav-bar/nav-bar.component.spec.ts:180:45 - error TS2345: Argument of type 'MenuItem[] | undefined' is not assignable to parameter of type 'Expected<ArrayLike<MenuItem>> | ArrayContaining<MenuItem>'.
-  Type 'undefined' is not assignable to type 'Expected<ArrayLike<MenuItem>> | ArrayContaining<MenuItem>'.
-
-180       expect(component.currentMenu).toEqual(parentItem.children);
-                                                ~~~~~~~~~~~~~~~~~~~
-
-
-Error: src/app/layout/nav-bar/nav-bar.component.spec.ts:193:45 - error TS2345: Argument of type 'SubMenuItem[] | undefined' is not assignable to parameter of type 'Expected<ArrayLike<MenuItem>> | ArrayContaining<MenuItem>'.
-
-193       expect(component.currentMenu).toEqual(component.data[MenuKeys.INSTRUCTIONS]);
-                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-Error: src/app/layout/nav-bar/nav-bar.component.spec.ts:310:81 - error TS2304: Cannot find name 'environment'.
-
-310       expect(mockLegacyComponentService.legacyUrl.next).toHaveBeenCalledWith(`${environment.kawaURL}${legacyUrl}`);
+              Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Menu Navigation should go back to previous menu FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+            at NodeInjectorFactory.factory (ng:///NavBarComponent/ɵfac.js:4:10)
+            at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:5984:44)
+            at createRootComponent (node_modules/@angular/core/fesm2022/core.mjs:15998:35)
+            at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:15858:29)
+            at apply (node_modules/@angular/core/fesm2022/testing.mjs:1979:51)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+            at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:14882:33)
+  Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Menu Navigation should close dropdown FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+            at NodeInjectorFactory.factory (ng:///NavBarComponent/ɵfac.js:4:10)
+            at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:5984:44)
+            at createRootComponent (node_modules/@angular/core/fesm2022/core.mjs:15998:35)
+            at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:15858:29)
+            at apply (node_modules/@angular/core/fesm2022/testing.mjs:1979:51)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+            at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:14882:33)
+Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent User Actions should logout user FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+            at NodeInjectorFactory.factory (ng:///NavBarComponent/ɵfac.js:4:10)
+            at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:5984:44)
+            at createRootComponent (node_modules/@angular/core/fesm2022/core.mjs:15998:35)
+            at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:15858:29)
+            at apply (node_modules/@angular/core/fesm2022/testing.mjs:1979:51)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+            at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:14882:33)
+Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent ngOnInit should call getMenuData on initialization FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+            at NodeInjectorFactory.factory (ng:///NavBarComponent/ɵfac.js:4:10)
+            at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:5984:44)
+            at createRootComponent (node_modules/@angular/core/fesm2022/core.mjs:15998:35)
+            at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:15858:29)
+            at apply (node_modules/@angular/core/fesm2022/testing.mjs:1979:51)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+            at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:14882:33)
+Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Navigation Methods should redirect to dashboard FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+            at NodeInjectorFactory.factory (ng:///NavBarComponent/ɵfac.js:4:10)
+            at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:5984:44)
+            at createRootComponent (node_modules/@angular/core/fesm2022/core.mjs:15998:35)
+            at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:15858:29)
+            at apply (node_modules/@angular/core/fesm2022/testing.mjs:1979:51)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+            at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:14882:33)
+Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Navigation Methods should navigate from menu with external URL FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+            at NodeInjectorFactory.factory (ng:///NavBarComponent/ɵfac.js:4:10)
+            at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:5984:44)
+            at createRootComponent (node_modules/@angular/core/fesm2022/core.mjs:15998:35)
+            at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:15858:29)
+            at apply (node_modules/@angular/core/fesm2022/testing.mjs:1979:51)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+            at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:14882:33)
+Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Navigation Methods should navigate from menu with internal URL FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+            at NodeInjectorFactory.factory (ng:///NavBarComponent/ɵfac.js:4:10)
+            at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:5984:44)
+            at createRootComponent (node_modules/@angular/core/fesm2022/core.mjs:15998:35)
+            at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:15858:29)
+            at apply (node_modules/@angular/core/fesm2022/testing.mjs:1979:51)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+            at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:14882:33)
+Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Navigation Methods should redirect to external URL FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+            at NodeInjectorFactory.factory (ng:///NavBarComponent/ɵfac.js:4:10)
+            at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:5984:44)
+            at createRootComponent (node_modules/@angular/core/fesm2022/core.mjs:15998:35)
+            at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:15858:29)
+            at apply (node_modules/@angular/core/fesm2022/testing.mjs:1979:51)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+            at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:14882:33)
+Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Navigation Methods should navigate to POS using router FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+            at NodeInjectorFactory.factory (ng:///NavBarComponent/ɵfac.js:4:10)
+            at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:5984:44)
+            at createRootComponent (node_modules/@angular/core/fesm2022/core.mjs:15998:35)
+            at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:15858:29)
+            at apply (node_modules/@angular/core/fesm2022/testing.mjs:1979:51)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+            at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:14882:33)
+Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Navigation Methods should navigate from menu with legacy URL FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+            at NodeInjectorFactory.factory (ng:///NavBarComponent/ɵfac.js:4:10)
+            at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:5984:44)
+            at createRootComponent (node_modules/@angular/core/fesm2022/core.mjs:15998:35)
+            at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:15858:29)
+            at apply (node_modules/@angular/core/fesm2022/testing.mjs:1979:51)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+            at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:14882:33)
+Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Navigation Methods should set language FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+            at NodeInjectorFactory.factory (ng:///NavBarComponent/ɵfac.js:4:10)
+            at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:5984:44)
+            at createRootComponent (node_modules/@angular/core/fesm2022/core.mjs:15998:35)
+            at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:15858:29)
+            at apply (node_modules/@angular/core/fesm2022/testing.mjs:1979:51)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+            at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:14882:33)
+Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Keyboard Navigation should open submenu with ArrowRight or Enter FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+            at NodeInjectorFactory.factory (ng:///NavBarComponent/ɵfac.js:4:10)
+            at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:5984:44)
+            at createRootComponent (node_modules/@angular/core/fesm2022/core.mjs:15998:35)
+            at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:15858:29)
+            at apply (node_modules/@angular/core/fesm2022/testing.mjs:1979:51)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+            at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:14882:33)
+Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Keyboard Navigation should close dropdown with Escape FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+            at NodeInjectorFactory.factory (ng:///NavBarComponent/ɵfac.js:4:10)
+            at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:5984:44)
+            at createRootComponent (node_modules/@angular/core/fesm2022/core.mjs:15998:35)
+            at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:15858:29)
+            at apply (node_modules/@angular/core/fesm2022/testing.mjs:1979:51)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+            at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:14882:33)
+Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Keyboard Navigation should go back with ArrowLeft FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+            at NodeInjectorFactory.factory (ng:///NavBarComponent/ɵfac.js:4:10)
+            at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:5984:44)
+            at createRootComponent (node_modules/@angular/core/fesm2022/core.mjs:15998:35)
+            at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:15858:29)
+            at apply (node_modules/@angular/core/fesm2022/testing.mjs:1979:51)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+            at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:14882:33)
+Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Keyboard Navigation should navigate down with ArrowDown FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+            at NodeInjectorFactory.factory (ng:///NavBarComponent/ɵfac.js:4:10)
+            at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:5984:44)
+            at createRootComponent (node_modules/@angular/core/fesm2022/core.mjs:15998:35)
+            at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:15858:29)
+            at apply (node_modules/@angular/core/fesm2022/testing.mjs:1979:51)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+            at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:14882:33)
+Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Keyboard Navigation should navigate up with ArrowUp FAILED
+        TypeError: Cannot read properties of undefined (reading 'subscribe')
+            at new NavBarComponent (src/app/layout/nav-bar/nav-bar.component.ts:48:52)
+            at NodeInjectorFactory.factory (ng:///NavBarComponent/ɵfac.js:4:10)
+            at getNodeInjectable (node_modules/@angular/core/fesm2022/core.mjs:5984:44)
+            at createRootComponent (node_modules/@angular/core/fesm2022/core.mjs:15998:35)
+            at ComponentFactory.create (node_modules/@angular/core/fesm2022/core.mjs:15858:29)
+            at apply (node_modules/@angular/core/fesm2022/testing.mjs:1979:51)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
+            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
+            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
+            at Object.onInvoke (node_modules/@angular/core/fesm2022/core.mjs:14882:33)
 });
