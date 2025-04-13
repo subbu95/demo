@@ -1240,3 +1240,129 @@ describe('NavBarComponent', () => {
     });
   });
 });
+
+////////version 0000000000001
+
+
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { NavBarComponent } from './nav-bar.component';
+import { MenuService } from '../../services/menu.service';
+import { SharedService } from '../../services/shared.service';
+import { SessionStorageService } from '../../services/session-storage.service';
+import { LoaderService } from '../../services/loader.service';
+import { CookieService } from 'ngx-cookie-service';
+import { UtilityService } from '../../services/utility.service';
+import { Router } from '@angular/router';
+import { LegacyComponentService } from '../../services/legacy-component.service';
+import { MenuKeys } from '../../models/common/menu-model';
+import { SessionKeys } from '../../models/common/login-model';
+import { of, throwError, Subject, Subscription } from 'rxjs';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { TruncatePipe } from '../../shared/pipe/truncate.pipe';
+import { OverlayModule } from '@angular/cdk/overlay';
+import { CommonModule } from '@angular/common';
+import { IconModule, ItemModule, MenuModule, TabModule, TooltipModule } from '@nielseniq/athena-core';
+import { MenuResponse, MenuItem, SubMenuItem, LanguageMenuItem } from '../../models/common/menu-model';
+import { environment } from '../../../environments/environment';
+
+describe('NavBarComponent', () => {
+  let component: NavBarComponent;
+  let fixture: ComponentFixture<NavBarComponent>;
+  let mockMenuService: jasmine.SpyObj<MenuService>;
+  let mockSharedService: jasmine.SpyObj<SharedService>;
+  let mockSessionStorageService: jasmine.SpyObj<SessionStorageService>;
+  let mockLoaderService: jasmine.SpyObj<LoaderService>;
+  let mockCookieService: jasmine.SpyObj<CookieService>;
+  let mockUtilityService: jasmine.SpyObj<UtilityService>;
+  let mockRouter: jasmine.SpyObj<Router>;
+  let mockLegacyComponentService: jasmine.SpyObj<LegacyComponentService>;
+  let messageSubject: Subject<boolean>;
+  let updateInstMenuSubject: Subject<SubMenuItem[]>;
+
+  const mockMenuResponse: MenuResponse = {
+    [MenuKeys.INSTRUCTIONS]: [{ menuItemName: 'Test', url: '/test' }],
+    [MenuKeys.LANGUAGE]: [{ languageName: 'English', url: '', lanCode: 'en' }],
+    [MenuKeys.MADRAS]: { url: '' },
+    [MenuKeys.REFERENTIAL]: { url: '' },
+    [MenuKeys.DATASCOPES]: { url: '' },
+    [MenuKeys.DATA_MAINTENANCE]: { url: '' },
+    [MenuKeys.FOLLOW_UP]: { url: '' },
+    [MenuKeys.DEVELOPMENT]: [],
+    [MenuKeys.ADMINISTRATION]: [],
+    [MenuKeys.GUIDELINES]: [],
+    [MenuKeys.POS]: { url: '' }
+  };
+
+  beforeEach(async () => {
+    messageSubject = new Subject<boolean>();
+    updateInstMenuSubject = new Subject<SubMenuItem[]>();
+    
+    mockMenuService = jasmine.createSpyObj('MenuService', ['getMenus', 'getInstructionMenu']);
+    mockSharedService = jasmine.createSpyObj('SharedService', ['updateInstructionsMenu', 'userLogout'], {
+      updateInstMenu$: updateInstMenuSubject.asObservable()
+    });
+    mockSessionStorageService = jasmine.createSpyObj('SessionStorageService', ['get', 'set', 'clear']);
+    mockLoaderService = jasmine.createSpyObj('LoaderService', ['showLoader', 'hideLoader']);
+    mockCookieService = jasmine.createSpyObj('CookieService', ['set']);
+    mockUtilityService = jasmine.createSpyObj('UtilityService', ['openSnackBar']);
+    mockRouter = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl']);
+    mockLegacyComponentService = jasmine.createSpyObj('LegacyComponentService', [], { 
+      message$: messageSubject.asObservable(),
+      legacyUrl: { next: jasmine.createSpy() }
+    });
+
+    await TestBed.configureTestingModule({
+      imports: [
+        CommonModule,
+        OverlayModule,
+        IconModule,
+        TabModule,
+        MenuModule,
+        ItemModule,
+        TooltipModule,
+        NavBarComponent,
+        TruncatePipe
+      ],
+      providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+        { provide: MenuService, useValue: mockMenuService },
+        { provide: SharedService, useValue: mockSharedService },
+        { provide: SessionStorageService, useValue: mockSessionStorageService },
+        { provide: LoaderService, useValue: mockLoaderService },
+        { provide: CookieService, useValue: mockCookieService },
+        { provide: UtilityService, useValue: mockUtilityService },
+        { provide: Router, useValue: mockRouter },
+        { provide: LegacyComponentService, useValue: mockLegacyComponentService }
+      ]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(NavBarComponent);
+    component = fixture.componentInstance;
+
+    // Mock the subscription in getMenuData
+    mockMenuService.getMenus.and.returnValue(of(mockMenuResponse));
+    mockSessionStorageService.get.and.returnValue('en');
+
+    fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    messageSubject.complete();
+    updateInstMenuSubject.complete();
+    fixture.destroy();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  describe('ngOnInit', () => {
+    it('should call getMenuData on initialization', () => {
+      expect(mockMenuService.getMenus).toHaveBeenCalled();
+    });
+  });
+
+  // ... rest of your tests remain the same ...
+});
