@@ -1366,3 +1366,63 @@ describe('NavBarComponent', () => {
 
   // ... rest of your tests remain the same ...
 });
+
+/////////version fixed tests
+
+describe('Keyboard Navigation', () => {
+  beforeEach(() => {
+    const testMenuItems: MenuItem[] = [
+      { menuItemName: 'Item 1', url: '/item1' },
+      { 
+        menuItemName: 'Item 2', 
+        url: '', 
+        children: [
+          { menuItemName: 'Subitem', url: '/subitem' }
+        ] 
+      }
+    ];
+    component.currentMenu = testMenuItems;
+    component.isDropdownOpen = true;
+    spyOn(window, 'open').and.callFake(() => null);
+  });
+
+  it('should navigate down with ArrowDown', () => {
+    const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
+    component.navigate(event);
+    expect(component.activeIndex).toBe(1);
+  });
+
+  it('should navigate up with ArrowUp', () => {
+    component.activeIndex = 1;
+    const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
+    component.navigate(event);
+    expect(component.activeIndex).toBe(0);
+  });
+
+  it('should open submenu with ArrowRight or Enter', () => {
+    component.activeIndex = 1; // Point to Item 2 which has children
+    spyOn(component, 'openSubmenu');
+    
+    const event = new KeyboardEvent('keydown', { key: 'ArrowRight' });
+    component.navigate(event);
+    
+    expect(component.openSubmenu).toHaveBeenCalled();
+  });
+
+  it('should go back with ArrowLeft', () => {
+    component.menuStack = [component.currentMenu];
+    spyOn(component, 'goBack');
+    
+    const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
+    component.navigate(event);
+    
+    expect(component.goBack).toHaveBeenCalled();
+  });
+
+  it('should close dropdown with Escape', () => {
+    spyOn(component, 'closeDropdown');
+    const event = new KeyboardEvent('keydown', { key: 'Escape' });
+    component.handleGlobalKeyboard(event);
+    expect(component.closeDropdown).toHaveBeenCalled();
+  });
+});
