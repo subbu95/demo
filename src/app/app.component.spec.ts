@@ -26,6 +26,10 @@ describe('AppComponent', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('h1')?.textContent).toContain('Hello, demo');
   });
+   NavBarComponent Navigation Methods should navigate to POS using router FAILED
+        Expected spy Router.navigateByUrl to have been called with:
+          [ '/pos' ]
+        but it was never called.
 ERROR: 'Error during cleanup of component', Object{component: NavBarComponent{menuService: Object{getMenus: ..., getInstructionMenu: ...}, sharedService: Object{updateInstructionsMenu: ..., userLogout: ..., updateInstMenu$: ...}, sessionStorageService: Object{get: ..., set: ..., clear: ...}, loaderService: Object{showLoader: ..., hideLoader: ...}, cookieService: Object{set: ...}, utilService: Object{openSnackBar: ...}, _router: Object{navigate: ..., navigateByUrl: ...}, _legacyService: Object{message$: ..., legacyUrl: ...}, leftNavMenuItems: [..., ..., ..., ..., ..., ...], rightNavMenuItems: [..., ..., ..., ..., ...], externalMenuItems: [..., ..., ..., ..., ..., ...], languageMenuItems: [...], data: Object{}, selectedLanguage: 'Language', subscription: Subscription{initialTeardown: ..., closed: ..., _parentage: ..., _finalizers: ...}, selectedIndices: [], SelectedTitleStack: [], currentMenu: [], currentLanguageMenu: [], menuStack: [], selectedMenuTitle: 'Main Menu', isDropdownOpen: false, isLanguageMenu: false, activeIndex: 0, __ngContext__: 0}, stacktrace: TypeError: Cannot read properties of null (reading 'disconnect')
 TypeError: Cannot read properties of null (reading 'disconnect')
     at TabLineListComponent.call [as ngOnDestroy] (http://localhost:9876/_karma_webpack_/webpack:/node_modules/@nielseniq/athena-core/fesm2022/nielseniq-athena-core.mjs:5988:22)
