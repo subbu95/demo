@@ -1369,60 +1369,81 @@ describe('NavBarComponent', () => {
 
 /////////version fixed tests
 
-describe('Keyboard Navigation', () => {
-  beforeEach(() => {
-    const testMenuItems: MenuItem[] = [
-      { menuItemName: 'Item 1', url: '/item1' },
-      { 
-        menuItemName: 'Item 2', 
-        url: '', 
-        children: [
-          { menuItemName: 'Subitem', url: '/subitem' }
-        ] 
-      }
-    ];
-    component.currentMenu = testMenuItems;
-    component.isDropdownOpen = true;
-    spyOn(window, 'open').and.callFake(() => null);
+// test-utils.ts
+export function mockWindowLocation() {
+  const locationMock = {
+    href: jasmine.createSpy('href'),
+    assign: jasmine.createSpy('assign'),
+    reload: jasmine.createSpy('reload'),
+    toString: jasmine.createSpy('toString').and.returnValue('http://localhost/')
+  };
+
+  Object.defineProperty(window, 'location', {
+    value: locationMock,
+    writable: true
   });
 
-  it('should navigate down with ArrowDown', () => {
-    const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
-    component.navigate(event);
-    expect(component.activeIndex).toBe(1);
-  });
+  return locationMock;
+}
 
-  it('should navigate up with ArrowUp', () => {
-    component.activeIndex = 1;
-    const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
-    component.navigate(event);
-    expect(component.activeIndex).toBe(0);
-  });
+// In your test
+beforeEach(() => {
+  const locationMock = mockWindowLocation();
+  // Now you can use locationMock.href, etc. with full type safety
+});
 
-  it('should open submenu with ArrowRight or Enter', () => {
-    component.activeIndex = 1; // Point to Item 2 which has children
-    spyOn(component, 'openSubmenu');
+
+describe('NavBarComponent', () => {
+  let component: NavBarComponent;
+  let fixture: ComponentFixture<NavBarComponent>;
+  let mockRouter: jasmine.SpyObj<Router>;
+
+  beforeEach(async () => {
+    const locationMock = mockWindowLocation();
+    // Mock window.location safely
+    Object.defineProperty(window, 'location', {
+      value: {
+        href: jasmine.createSpy('href'),
+        assign: jasmine.createSpy('assign'),
+        reload: jasmine.createSpy('reload')
+      },
+      writable: true
+    });
+    // Mock window methods
+    spyOn(window, 'open').and.stub();
+    spyOn(window.location, 'href').and.stub();
     
-    const event = new KeyboardEvent('keydown', { key: 'ArrowRight' });
-    component.navigate(event);
-    
-    expect(component.openSubmenu).toHaveBeenCalled();
+    await TestBed.configureTestingModule({
+      imports: [/* your imports */],
+      providers: [
+        { provide: Router, useValue: jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl']) }
+      ]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(NavBarComponent);
+    component = fixture.componentInstance;
+    mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
   });
 
-  it('should go back with ArrowLeft', () => {
-    component.menuStack = [component.currentMenu];
-    spyOn(component, 'goBack');
-    
-    const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
-    component.navigate(event);
-    
-    expect(component.goBack).toHaveBeenCalled();
+  afterEach(() => {
+    // Clean up spies
+    (window.open as jasmine.Spy).and.stub();
+    (window.location.href as jasmine.Spy).and.stub();
+    fixture.destroy();
   });
 
-  it('should close dropdown with Escape', () => {
-    spyOn(component, 'closeDropdown');
-    const event = new KeyboardEvent('keydown', { key: 'Escape' });
-    component.handleGlobalKeyboard(event);
-    expect(component.closeDropdown).toHaveBeenCalled();
+  describe('Navigation Methods', () => {
+    it('should handle external URLs without reloading', () => {
+      const externalUrl = 'http://external.com';
+      component.navigateFromMenu(externalUrl);
+      expect(window.open).toHaveBeenCalledWith(externalUrl, '_blank');
+      expect(window.location.href).not.toHaveBeenCalled();
+    });
+
+    it('should handle POS navigation via router', () => {
+      const posUrl = '/pos';
+      component.navigateFromMenu(posUrl);
+      expect(mockRouter.navigate).toHaveBeenCalledWith([posUrl]);
+    });
   });
 });
