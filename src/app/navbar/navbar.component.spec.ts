@@ -1737,3 +1737,321 @@ describe('NavBarComponent', () => {
     });
   });
 });
+
+
+
+////////version000000333333
+
+
+
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { NavBarComponent } from './nav-bar.component';
+import { MenuService } from '../../services/menu.service';
+import { SharedService } from '../../services/shared.service';
+import { SessionStorageService } from '../../services/session-storage.service';
+import { LoaderService } from '../../services/loader.service';
+import { CookieService } from 'ngx-cookie-service';
+import { UtilityService } from '../../services/utility.service';
+import { Router } from '@angular/router';
+import { LegacyComponentService } from '../../services/legacy-component.service';
+import { MenuKeys } from '../../models/common/menu-model';
+import { SessionKeys } from '../../models/common/login-model';
+import { of, throwError, Subject } from 'rxjs';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { TruncatePipe } from '../../shared/pipe/truncate.pipe';
+import { OverlayModule } from '@angular/cdk/overlay';
+import { CommonModule } from '@angular/common';
+import { IconModule, ItemModule, MenuModule, TabModule, TooltipModule } from '@nielseniq/athena-core';
+import { MenuResponse, MenuItem, SubMenuItem, LanguageMenuItem } from '../../models/common/menu-model';
+import { environment } from '../../../environments/environment';
+
+// Create a properly typed mock for window.location
+interface MockLocation {
+  href: jasmine.Spy;
+  assign: jasmine.Spy;
+  reload: jasmine.Spy;
+  replace: jasmine.Spy;
+  toString: jasmine.Spy;
+}
+
+const createLocationMock = (): MockLocation => ({
+  href: jasmine.createSpy('href'),
+  assign: jasmine.createSpy('assign'),
+  reload: jasmine.createSpy('reload'),
+  replace: jasmine.createSpy('replace'),
+  toString: jasmine.createSpy('toString').and.returnValue('http://localhost/')
+});
+
+describe('NavBarComponent', () => {
+  let component: NavBarComponent;
+  let fixture: ComponentFixture<NavBarComponent>;
+  let mockMenuService: jasmine.SpyObj<MenuService>;
+  let mockSharedService: jasmine.SpyObj<SharedService>;
+  let mockSessionStorageService: jasmine.SpyObj<SessionStorageService>;
+  let mockLoaderService: jasmine.SpyObj<LoaderService>;
+  let mockCookieService: jasmine.SpyObj<CookieService>;
+  let mockUtilityService: jasmine.SpyObj<UtilityService>;
+  let mockRouter: jasmine.SpyObj<Router>;
+  let mockLegacyComponentService: jasmine.SpyObj<LegacyComponentService>;
+  let messageSubject: Subject<boolean>;
+  let updateInstMenuSubject: Subject<SubMenuItem[]>;
+  let locationMock: MockLocation;
+
+  const mockMenuResponse: MenuResponse = {
+    [MenuKeys.INSTRUCTIONS]: [{ menuItemName: 'Test', url: '/test' }],
+    [MenuKeys.LANGUAGE]: [{ languageName: 'English', url: '', lanCode: 'en' }],
+    [MenuKeys.MADRAS]: { url: 'http://madras.com' },
+    [MenuKeys.REFERENTIAL]: { url: 'http://referential.com' },
+    [MenuKeys.DATASCOPES]: { url: 'http://datascopes.com' },
+    [MenuKeys.DATA_MAINTENANCE]: { url: 'http://data-maintenance.com' },
+    [MenuKeys.FOLLOW_UP]: { url: 'http://follow-up.com' },
+    [MenuKeys.DEVELOPMENT]: [],
+    [MenuKeys.ADMINISTRATION]: [],
+    [MenuKeys.GUIDELINES]: [],
+    [MenuKeys.POS]: { url: '/pos' }
+  };
+
+  beforeAll(() => {
+    // Setup window.location mock
+    locationMock = createLocationMock();
+    Object.defineProperty(window, 'location', {
+      value: locationMock,
+      writable: true
+    });
+
+    // Mock window.open
+    spyOn(window, 'open').and.callFake(() => null);
+  });
+
+  beforeEach(() => {
+    messageSubject = new Subject<boolean>();
+    updateInstMenuSubject = new Subject<SubMenuItem[]>();
+    
+    mockMenuService = jasmine.createSpyObj('MenuService', ['getMenus', 'getInstructionMenu']);
+    mockSharedService = jasmine.createSpyObj('SharedService', ['updateInstructionsMenu', 'userLogout'], {
+      updateInstMenu$: updateInstMenuSubject.asObservable()
+    });
+    mockSessionStorageService = jasmine.createSpyObj('SessionStorageService', ['get', 'set', 'clear']);
+    mockLoaderService = jasmine.createSpyObj('LoaderService', ['showLoader', 'hideLoader']);
+    mockCookieService = jasmine.createSpyObj('CookieService', ['set']);
+    mockUtilityService = jasmine.createSpyObj('UtilityService', ['openSnackBar']);
+    mockRouter = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl']);
+    mockLegacyComponentService = jasmine.createSpyObj('LegacyComponentService', [], { 
+      message$: messageSubject.asObservable(),
+      legacyUrl: { next: jasmine.createSpy() }
+    });
+
+    TestBed.configureTestingModule({
+      imports: [
+        CommonModule,
+        OverlayModule,
+        IconModule,
+        TabModule,
+        MenuModule,
+        ItemModule,
+        TooltipModule,
+        NavBarComponent,
+        TruncatePipe
+      ],
+      providers: [
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+        { provide: MenuService, useValue: mockMenuService },
+        { provide: SharedService, useValue: mockSharedService },
+        { provide: SessionStorageService, useValue: mockSessionStorageService },
+        { provide: LoaderService, useValue: mockLoaderService },
+        { provide: CookieService, useValue: mockCookieService },
+        { provide: UtilityService, useValue: mockUtilityService },
+        { provide: Router, useValue: mockRouter },
+        { provide: LegacyComponentService, useValue: mockLegacyComponentService }
+      ]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(NavBarComponent);
+    component = fixture.componentInstance;
+
+    mockMenuService.getMenus.and.returnValue(of(mockMenuResponse));
+    mockSessionStorageService.get.and.returnValue('en');
+
+    fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    // Clean up subscriptions and mocks
+    messageSubject.complete();
+    updateInstMenuSubject.complete();
+    locationMock.href.calls.reset();
+    locationMock.assign.calls.reset();
+    (window.open as jasmine.Spy).calls.reset();
+    fixture.destroy();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  describe('Keyboard Navigation', () => {
+    const testMenuItems: MenuItem[] = [
+      { menuItemName: 'Item 1', url: '/item1' },
+      { 
+        menuItemName: 'Item 2', 
+        url: '', 
+        children: [
+          { menuItemName: 'Subitem', url: '/subitem' }
+        ] 
+      }
+    ];
+
+    beforeEach(() => {
+      component.currentMenu = testMenuItems;
+      component.isDropdownOpen = true;
+    });
+
+    it('should navigate down with ArrowDown', () => {
+      const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
+      component.navigate(event);
+      expect(component.activeIndex).toBe(1);
+    });
+
+    it('should navigate up with ArrowUp', () => {
+      component.activeIndex = 1;
+      const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
+      component.navigate(event);
+      expect(component.activeIndex).toBe(0);
+    });
+
+    it('should open submenu with ArrowRight or Enter', () => {
+      component.activeIndex = 1; // Point to Item 2 which has children
+      spyOn(component, 'openSubmenu');
+      
+      const rightEvent = new KeyboardEvent('keydown', { key: 'ArrowRight' });
+      component.navigate(rightEvent);
+      
+      expect(component.openSubmenu).toHaveBeenCalledWith(testMenuItems[1], 1);
+    });
+
+    it('should go back with ArrowLeft', () => {
+      component.menuStack = [testMenuItems];
+      spyOn(component, 'goBack');
+      
+      const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
+      component.navigate(event);
+      
+      expect(component.goBack).toHaveBeenCalled();
+    });
+
+    it('should close dropdown with Escape', () => {
+      spyOn(component, 'closeDropdown');
+      const event = new KeyboardEvent('keydown', { key: 'Escape' });
+      component.handleGlobalKeyboard(event);
+      expect(component.closeDropdown).toHaveBeenCalled();
+    });
+  });
+
+  describe('Navigation Methods', () => {
+    it('should redirect to dashboard', () => {
+      component.redirectToDashboard();
+      expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/dashboard');
+    });
+
+    it('should redirect to external URL using window.open', () => {
+      const externalUrl = 'http://external.com';
+      component.data = {
+        ...mockMenuResponse,
+        [MenuKeys.MADRAS]: { url: externalUrl }
+      };
+      
+      component.redirectToExternal(MenuKeys.MADRAS);
+      expect(window.open).toHaveBeenCalledWith(externalUrl, '_blank');
+      expect(locationMock.href).not.toHaveBeenCalled();
+    });
+
+    it('should navigate to POS using router', () => {
+      component.data = {
+        ...mockMenuResponse,
+        [MenuKeys.POS]: { url: '/pos' }
+      };
+      
+      component.redirectToExternal(MenuKeys.POS);
+      expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/pos');
+    });
+
+    it('should set language', () => {
+      component.data = mockMenuResponse;
+      
+      component.setLanguage('en');
+      
+      expect(mockSessionStorageService.set).toHaveBeenCalledWith(SessionKeys.LANGUAGE_CODE, 'en');
+      expect(mockCookieService.set).toHaveBeenCalled();
+      expect(component.selectedLanguage).toBe('English');
+      expect(component.isDropdownOpen).toBeFalse();
+    });
+
+    it('should navigate from menu with legacy URL', fakeAsync(() => {
+      const legacyUrl = 'legacy.action';
+      spyOn(component, 'closeDropdown');
+      spyOn(component, 'resetMenu');
+      
+      component.navigateFromMenu(legacyUrl);
+      tick();
+      
+      expect(component.closeDropdown).toHaveBeenCalled();
+      expect(component.resetMenu).toHaveBeenCalled();
+      expect(mockLegacyComponentService.legacyUrl.next).toHaveBeenCalledWith(`${environment.kawaURL}${legacyUrl}`);
+      expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/legacy', jasmine.any(Object));
+    }));
+
+    it('should navigate from menu with external URL', () => {
+      const externalUrl = 'http://external.com';
+      spyOn(component, 'closeDropdown');
+      spyOn(component, 'resetMenu');
+      
+      component.navigateFromMenu(externalUrl);
+      
+      expect(component.closeDropdown).toHaveBeenCalled();
+      expect(component.resetMenu).toHaveBeenCalled();
+      expect(window.open).toHaveBeenCalledWith(externalUrl, '_blank');
+    });
+
+    it('should navigate from menu with internal URL', () => {
+      const internalUrl = '/internal';
+      spyOn(component, 'closeDropdown');
+      spyOn(component, 'resetMenu');
+      
+      component.navigateFromMenu(internalUrl);
+      
+      expect(component.closeDropdown).toHaveBeenCalled();
+      expect(component.resetMenu).toHaveBeenCalled();
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/internal']);
+    });
+  });
+
+  describe('User Actions', () => {
+    it('should logout user', fakeAsync(() => {
+      const mockEvent = new Event('click');
+      mockSharedService.userLogout.and.returnValue(of(null));
+      
+      component.userLogout(mockEvent);
+      tick();
+      
+      expect(mockLoaderService.showLoader).toHaveBeenCalled();
+      expect(mockSharedService.userLogout).toHaveBeenCalled();
+      expect(mockLoaderService.hideLoader).toHaveBeenCalled();
+    }));
+  });
+
+  describe('ngOnDestroy', () => {
+    it('should unsubscribe from subscriptions', () => {
+      // Add a test subscription
+      const testSub = new Subject().subscribe();
+      component.subscription.add(testSub);
+      
+      spyOn(component.subscription, 'unsubscribe');
+      component.ngOnDestroy();
+      
+      expect(component.subscription.unsubscribe).toHaveBeenCalled();
+      expect(testSub.closed).toBeTrue();
+    });
+  });
+});
