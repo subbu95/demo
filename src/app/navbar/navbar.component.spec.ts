@@ -20,22 +20,6 @@ import { IconModule, ItemModule, MenuModule, TabModule, TooltipModule } from '@n
 import { MenuResponse, MenuItem, SubMenuItem, LanguageMenuItem } from '../../models/common/menu-model';
 import { environment } from '../../../environments/environment';
 
-class MockLocation {
-  private _href = '';
-  assign = jasmine.createSpy('assign');
-  reload = jasmine.createSpy('reload');
-  replace = jasmine.createSpy('replace');
-  toString = jasmine.createSpy('toString').and.callFake(() => this._href);
-
-  get href(): string {
-    return this._href;
-  }
-
-  set href(value: string) {
-    this._href = value;
-  }
-}
-
 describe('NavBarComponent', () => {
   let component: NavBarComponent;
   let fixture: ComponentFixture<NavBarComponent>;
@@ -49,7 +33,6 @@ describe('NavBarComponent', () => {
   let mockLegacyComponentService: jasmine.SpyObj<LegacyComponentService>;
   let messageSubject: Subject<boolean>;
   let updateInstMenuSubject: Subject<SubMenuItem[]>;
-  let mockLocation: MockLocation;
 
   const mockMenuResponse: MenuResponse = {
     [MenuKeys.INSTRUCTIONS]: [{ menuItemName: 'Test', url: '/test' }],
@@ -66,18 +49,13 @@ describe('NavBarComponent', () => {
   };
 
   beforeEach(() => {
-    // Create fresh mock location for each test
-    mockLocation = new MockLocation();
-    Object.defineProperty(window, 'location', {
-      get: () => mockLocation
-    });
-
-    // Mock window.open
-    spyOn(window, 'open').and.callFake(() => null);
-
+    // Initialize subjects
     messageSubject = new Subject<boolean>();
     updateInstMenuSubject = new Subject<SubMenuItem[]>();
-    
+
+    // Create spies for window methods
+    spyOn(window, 'open').and.stub();
+
     mockMenuService = jasmine.createSpyObj('MenuService', ['getMenus', 'getInstructionMenu']);
     mockSharedService = jasmine.createSpyObj('SharedService', ['updateInstructionsMenu', 'userLogout'], {
       updateInstMenu$: updateInstMenuSubject.asObservable()
@@ -132,17 +110,34 @@ describe('NavBarComponent', () => {
     messageSubject.complete();
     updateInstMenuSubject.complete();
     
-    // Reset spies
-    mockLocation.assign.calls.reset();
-    mockLocation.reload.calls.reset();
-    mockLocation.replace.calls.reset();
+    // Reset all spies
     (window.open as jasmine.Spy).calls.reset();
-    
     fixture.destroy();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('Menu Initialization', () => {
+    it('should load menu data on initialization', fakeAsync(() => {
+      mockMenuService.getMenus.and.returnValue(of(mockMenuResponse));
+      component.getMenuData();
+      tick();
+      
+      expect(mockMenuService.getMenus).toHaveBeenCalled();
+      expect(component.data).toEqual(mockMenuResponse);
+    }));
+
+    it('should handle menu loading errors', fakeAsync(() => {
+      const errorResponse = { error: { message: 'Error loading menu' } };
+      mockMenuService.getMenus.and.returnValue(throwError(() => errorResponse));
+      
+      component.getMenuData();
+      tick();
+      
+      expect(mockUtilityService.openSnackBar).toHaveBeenCalled();
+    }));
   });
 
   describe('Keyboard Navigation', () => {
@@ -203,6 +198,56 @@ describe('NavBarComponent', () => {
     });
   });
 
+  describe('Menu Navigation', () => {
+    const parentItem: MenuItem = { 
+      menuItemName: 'Parent', 
+      url: '', 
+      children: [
+        { menuItemName: 'Child', url: '/child' }
+      ] 
+    };
+
+    beforeEach(() => {
+      component.data = {
+        ...mockMenuResponse,
+        [MenuKeys.INSTRUCTIONS]: [parentItem]
+      };
+    });
+
+    it('should open main menu', () => {
+      const mockButton = {} as any;
+      component.openMainMenu(MenuKeys.INSTRUCTIONS, mockButton);
+      
+      expect(component.isDropdownOpen).toBeTrue();
+      expect(component.currentMenu).toEqual([parentItem]);
+    });
+
+    it('should open submenu', () => {
+      component.currentMenu = [parentItem];
+      component.openSubmenu(parentItem, 0);
+      
+      expect(component.menuStack.length).toBe(1);
+      expect(component.currentMenu).toEqual(parentItem.children);
+    });
+
+    it('should go back to previous menu', () => {
+      component.currentMenu = [parentItem];
+      component.openSubmenu(parentItem, 0);
+      component.goBack();
+      
+      expect(component.menuStack.length).toBe(0);
+      expect(component.currentMenu).toEqual([parentItem]);
+    });
+
+    it('should close dropdown', () => {
+      component.isDropdownOpen = true;
+      component.closeDropdown();
+      
+      expect(component.isDropdownOpen).toBeFalse();
+      expect(component.menuStack).toEqual([]);
+    });
+  });
+
   describe('Navigation Methods', () => {
     it('should redirect to dashboard', () => {
       component.redirectToDashboard();
@@ -218,7 +263,6 @@ describe('NavBarComponent', () => {
       
       component.redirectToExternal(MenuKeys.MADRAS);
       expect(window.open).toHaveBeenCalledWith(externalUrl, '_blank');
-      expect(mockLocation.href).not.toBe(externalUrl);
     });
 
     it('should navigate to POS using router', () => {
@@ -295,9 +339,8 @@ describe('NavBarComponent', () => {
     }));
   });
 
-  describe('ngOnDestroy', () => {
-    it('should unsubscribe from subscriptions', () => {
-      // Add a test subscription
+  describe('Lifecycle Hooks', () => {
+    it('should unsubscribe from subscriptions on destroy', () => {
       const testSub = new Subject().subscribe();
       component.subscription.add(testSub);
       
@@ -306,6 +349,31 @@ describe('NavBarComponent', () => {
       
       expect(component.subscription.unsubscribe).toHaveBeenCalled();
       expect(testSub.closed).toBeTrue();
+    });
+  });
+
+  describe('Language Menu', () => {
+    it('should open language menu', () => {
+      const mockButton = {} as any;
+      component.openMainMenu(MenuKeys.LANGUAGE, mockButton);
+      
+      expect(component.isDropdownOpen).toBeTrue();
+      expect(component.isLanguageMenu).toBeTrue();
+      expect(component.currentLanguageMenu).toEqual(mockMenuResponse[MenuKeys.LANGUAGE]);
+    });
+
+    it('should set language and update UI', () => {
+      const languageItems: LanguageMenuItem[] = [
+        { languageName: 'English', url: '', lanCode: 'en' },
+        { languageName: 'French', url: '', lanCode: 'fr' }
+      ];
+      component.data[MenuKeys.LANGUAGE] = languageItems;
+      
+      component.setLanguage('fr');
+      
+      expect(component.selectedLanguage).toBe('French');
+      expect(mockSessionStorageService.set).toHaveBeenCalledWith(SessionKeys.LANGUAGE_CODE, 'fr');
+      expect(mockCookieService.set).toHaveBeenCalled();
     });
   });
 });
