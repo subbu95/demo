@@ -2211,3 +2211,100 @@ describe('NavBarComponent', () => {
 
   // ... rest of your test cases ...
 });
+
+
+
+
+
+
+
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { NavBarComponent } from './nav-bar.component';
+// ... other imports remain the same ...
+
+describe('NavBarComponent', () => {
+  let component: NavBarComponent;
+  let fixture: ComponentFixture<NavBarComponent>;
+  // ... other declarations ...
+  let locationMock: any;
+
+  const mockMenuResponse: MenuResponse = {
+    // ... mock data remains the same ...
+  };
+
+  beforeEach(() => {
+    // Create location mock without deleting original
+    locationMock = {
+      href: '',
+      assign: jasmine.createSpy('assign'),
+      reload: jasmine.createSpy('reload'),
+      replace: jasmine.createSpy('replace'),
+      toString: jasmine.createSpy('toString').and.returnValue('http://localhost/')
+    };
+
+    // Mock window.open
+    spyOn(window, 'open').and.callFake(() => null);
+
+    messageSubject = new Subject<boolean>();
+    updateInstMenuSubject = new Subject<SubMenuItem[]>();
+    
+    mockMenuService = jasmine.createSpyObj('MenuService', ['getMenus', 'getInstructionMenu']);
+    mockSharedService = jasmine.createSpyObj('SharedService', ['updateInstructionsMenu', 'userLogout'], {
+      updateInstMenu$: updateInstMenuSubject.asObservable()
+    });
+    // ... other service mocks remain the same ...
+
+    TestBed.configureTestingModule({
+      imports: [
+        // ... imports remain the same ...
+      ],
+      providers: [
+        // ... providers remain the same ...
+      ]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(NavBarComponent);
+    component = fixture.componentInstance;
+
+    // Override location for tests
+    Object.defineProperty(window, 'location', {
+      get: () => locationMock
+    });
+
+    mockMenuService.getMenus.and.returnValue(of(mockMenuResponse));
+    mockSessionStorageService.get.and.returnValue('en');
+
+    fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    // Complete subjects only if they exist
+    if (messageSubject) {
+      messageSubject.complete();
+    }
+    if (updateInstMenuSubject) {
+      updateInstMenuSubject.complete();
+    }
+    fixture.destroy();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  describe('Navigation Methods', () => {
+    it('should handle external URLs using window.open', () => {
+      const externalUrl = 'http://external.com';
+      component.navigateFromMenu(externalUrl);
+      expect(window.open).toHaveBeenCalledWith(externalUrl, '_blank');
+    });
+
+    it('should handle internal URLs using router', () => {
+      const internalUrl = '/internal';
+      component.navigateFromMenu(internalUrl);
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/internal']);
+    });
+  });
+
+  // ... rest of your test cases ...
+});
