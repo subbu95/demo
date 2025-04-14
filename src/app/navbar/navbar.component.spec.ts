@@ -22,16 +22,15 @@ describe('EclipseAthenaDialogComponent', () => {
     mockUtilityService = jasmine.createSpyObj('UtilityService', ['downloadFile']);
 
     await TestBed.configureTestingModule({
-      imports: [],
+      declarations: [EclipseAthenaDialogComponent],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: DetailsDataService, useValue: mockDetailsService },
         { provide: LoaderService, useValue: mockLoaderService },
-        { provide: UtilityService, useValue: mockUtilityService },
+        { provide: UtilityService, useValue: mockUtilityService }
       ],
-      declarations: [EclipseAthenaDialogComponent],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
 
     fixture = TestBed.createComponent(EclipseAthenaDialogComponent);
@@ -39,97 +38,92 @@ describe('EclipseAthenaDialogComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create the component', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize data correctly on ngOnInit()', () => {
-    mockDetailsService.getDetailsData.and.returnValue(of([
-      { label: 'Status', value: 'OK' }
-    ]));
+  it('should initialize log data and default tab', () => {
+    mockDetailsService.getDetailsData.and.returnValue(of([{ label: 'Status', value: 'OK' }]));
     component.ngOnInit();
     expect(mockDetailsService.getDetailsData).toHaveBeenCalled();
   });
 
-  it('should handle tab change to primary tab', () => {
-    component.onSelectedChange('log-tab', 123);
+  it('should set isPrimaryTabActive true when log-tab is selected', () => {
+    component.onSelectedChange('log-tab', 100);
     expect(component.isPrimaryTabActive).toBeTrue();
     expect(component.isSecondaryTabActive).toBeFalse();
   });
 
-  it('should handle tab change to secondary tab and call service', () => {
-    mockDetailsService.getDetailsData.and.returnValue(of([
-      { label: 'Step', value: 'COMPLETED' }
-    ]));
-    component.onSelectedChange('details-tab', 456);
+  it('should load details data when details-tab is selected', () => {
+    const mockData = [{ label: 'Step', value: 'FINISHED' }];
+    mockDetailsService.getDetailsData.and.returnValue(of(mockData));
+
+    component.onSelectedChange('details-tab', 200);
+    expect(component.detailsData).toEqual(mockData);
     expect(component.isPrimaryTabActive).toBeFalse();
     expect(component.isSecondaryTabActive).toBeTrue();
-    expect(mockDetailsService.getDetailsData).toHaveBeenCalledWith(456);
+    expect(component.hasError).toBeFalse();
   });
 
-  it('should show error UI on error response for details tab', () => {
-    mockDetailsService.getDetailsData.and.returnValue(throwError(() => new Error('Service error')));
-    component.onSelectedChange('details-tab', 789);
+  it('should handle service error for details-tab', () => {
+    mockDetailsService.getDetailsData.and.returnValue(throwError(() => new Error('Failure')));
+    component.onSelectedChange('details-tab', 300);
     expect(component.hasError).toBeTrue();
+    expect(component.detailsData).toEqual([]);
   });
 
-  it('should close dialog on onCloseDialogEvent()', () => {
-    const closeSpy = spyOn(component.closeDialog, 'emit');
-    component.onCloseDialogEvent();
-    expect(closeSpy).toHaveBeenCalled();
-  });
-
-  it('should close dialog on onDialogCloseIconClick()', () => {
-    const closeSpy = spyOn(component.closeDialog, 'emit');
+  it('should emit closeDialog on onDialogCloseIconClick', () => {
+    spyOn(component.closeDialog, 'emit');
     component.onDialogCloseIconClick();
-    expect(closeSpy).toHaveBeenCalled();
+    expect(component.closeDialog.emit).toHaveBeenCalled();
   });
 
-  it('should call downloadFile() and utility service', () => {
-    component.monId = 111;
+  it('should emit closeDialog on onCloseDialogEvent', () => {
+    spyOn(component.closeDialog, 'emit');
+    component.onCloseDialogEvent();
+    expect(component.closeDialog.emit).toHaveBeenCalled();
+  });
+
+  it('should call UtilityService.downloadFile with monId', () => {
+    component.monId = 999;
     component.downloadFile();
-    expect(mockUtilityService.downloadFile).toHaveBeenCalledWith(111);
+    expect(mockUtilityService.downloadFile).toHaveBeenCalledWith(999);
   });
 
-  it('should render primary tab log section', () => {
+  it('should render loader when isLoading is true', () => {
+    component.isLoading = true;
+    fixture.detectChanges();
+    const loader = fixture.nativeElement.querySelector('.loader-gif');
+    expect(loader).toBeTruthy();
+  });
+
+  it('should render details when secondary tab active and no error', () => {
+    component.isSecondaryTabActive = true;
+    component.detailsData = [{ label: 'Result', value: 'PASS' }];
+    component.hasError = false;
+    fixture.detectChanges();
+
+    const value = fixture.nativeElement.querySelector('.value');
+    expect(value.textContent).toContain('PASS');
+  });
+
+  it('should render log content when primary tab active', () => {
     component.isPrimaryTabActive = true;
-    component.isLoading = false;
-    component.logArray1 = [{ label: 'Log1', value: 'Value1' }];
-    component.logArray2 = [{ label: 'Log2', value: 'Value2' }];
-    component.logContent = 'Log content here';
+    component.logContent = 'Test log here';
     fixture.detectChanges();
 
     const textArea = fixture.nativeElement.querySelector('textarea');
-    expect(textArea.textContent).toContain('Log content here');
+    expect(textArea.textContent).toContain('Test log here');
   });
 
-  it('should render secondary tab details', () => {
-    component.isSecondaryTabActive = true;
-    component.isLoading = false;
-    component.detailsData = [{ label: 'Step', value: 'COMPLETED' }];
-    fixture.detectChanges();
-
-    const valueCell = fixture.nativeElement.querySelector('.value');
-    expect(valueCell.textContent).toContain('COMPLETED');
-  });
-
-  it('should show loader when isLoading is true', () => {
-    component.isLoading = true;
-    fixture.detectChanges();
-
-    const loaderImg = fixture.nativeElement.querySelector('.loader-gif');
-    expect(loaderImg).toBeTruthy();
-  });
-
-  it('should display error image and message when no tab is active and has error', () => {
+  it('should show error image and message when hasError is true and no tab active', () => {
     component.isPrimaryTabActive = false;
     component.isSecondaryTabActive = false;
     component.hasError = true;
     component.errorMessage = 'Something went wrong';
     fixture.detectChanges();
 
-    const errorMsg = fixture.nativeElement.querySelector('.second-msg');
-    expect(errorMsg.textContent).toContain('Something went wrong');
+    const message = fixture.nativeElement.querySelector('.second-msg');
+    expect(message.textContent).toContain('Something went wrong');
   });
 });
-
