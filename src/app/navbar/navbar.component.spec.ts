@@ -12,9 +12,9 @@ describe('EclipseAthenaDialogComponent', () => {
   let component: EclipseAthenaDialogComponent;
   let fixture: ComponentFixture<EclipseAthenaDialogComponent>;
 
-  let mockDetailsService: jasmine.SpyObj<DetailsDataService>;
-  let mockLoaderService: jasmine.SpyObj<LoaderService>;
-  let mockUtilityService: jasmine.SpyObj<UtilityService>;
+  let mockDetailsService: jasmine.SpyObj<Pick<DetailsDataService, 'getDetailsData'>>;
+  let mockLoaderService: jasmine.SpyObj<Pick<LoaderService, 'showLoader' | 'hideLoader'>>;
+  let mockUtilityService: jasmine.SpyObj<Pick<UtilityService, 'downloadFile'>>;
 
   beforeEach(async () => {
     mockDetailsService = jasmine.createSpyObj('DetailsDataService', ['getDetailsData']);
@@ -31,7 +31,7 @@ describe('EclipseAthenaDialogComponent', () => {
         { provide: UtilityService, useValue: mockUtilityService },
       ],
       declarations: [EclipseAthenaDialogComponent],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA], // To ignore unknown Athena Core tags
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(EclipseAthenaDialogComponent);
@@ -132,3 +132,4 @@ describe('EclipseAthenaDialogComponent', () => {
     expect(errorMsg.textContent).toContain('Something went wrong');
   });
 });
+
