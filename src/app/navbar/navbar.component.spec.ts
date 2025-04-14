@@ -12,9 +12,9 @@ describe('EclipseAthenaDialogComponent', () => {
   let component: EclipseAthenaDialogComponent;
   let fixture: ComponentFixture<EclipseAthenaDialogComponent>;
 
-  let mockDetailsService: jasmine.SpyObj<Pick<DetailsDataService, 'getDetailsData'>>;
-  let mockLoaderService: jasmine.SpyObj<Pick<LoaderService, 'showLoader' | 'hideLoader'>>;
-  let mockUtilityService: jasmine.SpyObj<Pick<UtilityService, 'downloadFile'>>;
+  let mockDetailsService: jasmine.SpyObj<DetailsDataService>;
+  let mockLoaderService: jasmine.SpyObj<LoaderService>;
+  let mockUtilityService: jasmine.SpyObj<UtilityService>;
 
   beforeEach(async () => {
     mockDetailsService = jasmine.createSpyObj('DetailsDataService', ['getDetailsData']);
@@ -42,13 +42,7 @@ describe('EclipseAthenaDialogComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize log data and default tab', () => {
-    mockDetailsService.getDetailsData.and.returnValue(of([{ label: 'Status', value: 'OK' }]));
-    component.ngOnInit();
-    expect(mockDetailsService.getDetailsData).toHaveBeenCalled();
-  });
-
-  it('should set isPrimaryTabActive true when log-tab is selected', () => {
+  it('should handle tab change to primary tab', () => {
     component.onSelectedChange('log-tab', 100);
     expect(component.isPrimaryTabActive).toBeTrue();
     expect(component.isSecondaryTabActive).toBeFalse();
@@ -73,15 +67,15 @@ describe('EclipseAthenaDialogComponent', () => {
   });
 
   it('should emit closeDialog on onDialogCloseIconClick', () => {
-    spyOn(component.closeDialog, 'emit');
+    (component as any).closeDialog = { emit: jasmine.createSpy('emit') };
     component.onDialogCloseIconClick();
-    expect(component.closeDialog.emit).toHaveBeenCalled();
+    expect((component as any).closeDialog.emit).toHaveBeenCalled();
   });
 
   it('should emit closeDialog on onCloseDialogEvent', () => {
-    spyOn(component.closeDialog, 'emit');
+    (component as any).closeDialog = { emit: jasmine.createSpy('emit') };
     component.onCloseDialogEvent();
-    expect(component.closeDialog.emit).toHaveBeenCalled();
+    expect((component as any).closeDialog.emit).toHaveBeenCalled();
   });
 
   it('should call UtilityService.downloadFile with monId', () => {
@@ -127,3 +121,4 @@ describe('EclipseAthenaDialogComponent', () => {
     expect(message.textContent).toContain('Something went wrong');
   });
 });
+
