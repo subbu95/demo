@@ -7,286 +7,61 @@ describe('AppComponent', () => {
       imports: [AppComponent],
     }).compileComponents();
   });
-Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Keyboard Navigation should navigate down with ArrowDown FAILED
-        TypeError: Cannot redefine property: location
-            at Function.defineProperty (<anonymous>)
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:71:12)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-        TypeError: Cannot read properties of undefined (reading 'complete')
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:132:20)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Keyboard Navigation should navigate up with ArrowUp FAILED
-        TypeError: Cannot redefine property: location
-            at Function.defineProperty (<anonymous>)
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:71:12)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-        TypeError: Cannot read properties of undefined (reading 'complete')
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:132:20)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Keyboard Navigation should close dropdown with Escape FAILED
-        TypeError: Cannot redefine property: location
-            at Function.defineProperty (<anonymous>)
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:71:12)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-        TypeError: Cannot read properties of undefined (reading 'complete')
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:132:20)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Keyboard Navigation should open submenu with ArrowRight or Enter FAILED
-        TypeError: Cannot redefine property: location
-            at Function.defineProperty (<anonymous>)
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:71:12)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-        TypeError: Cannot read properties of undefined (reading 'complete')
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:132:20)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Keyboard Navigation should go back with ArrowLeft FAILED
-        TypeError: Cannot redefine property: location
-            at Function.defineProperty (<anonymous>)
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:71:12)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-        TypeError: Cannot read properties of undefined (reading 'complete')
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:132:20)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent ngOnDestroy should unsubscribe from subscriptions FAILED
-        TypeError: Cannot redefine property: location
-            at Function.defineProperty (<anonymous>)
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:71:12)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-        TypeError: Cannot read properties of undefined (reading 'complete')
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:132:20)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Navigation Methods should redirect to dashboard FAILED
-        TypeError: Cannot redefine property: location
-            at Function.defineProperty (<anonymous>)
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:71:12)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-        TypeError: Cannot read properties of undefined (reading 'complete')
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:132:20)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Navigation Methods should set language FAILED
-        TypeError: Cannot redefine property: location
-            at Function.defineProperty (<anonymous>)
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:71:12)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-        TypeError: Cannot read properties of undefined (reading 'complete')
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:132:20)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Navigation Methods should navigate from menu with legacy URL FAILED
-        TypeError: Cannot redefine property: location
-            at Function.defineProperty (<anonymous>)
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:71:12)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-        TypeError: Cannot read properties of undefined (reading 'complete')
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:132:20)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Navigation Methods should redirect to external URL using window.open FAILED
-        TypeError: Cannot redefine property: location
-            at Function.defineProperty (<anonymous>)
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:71:12)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-        TypeError: Cannot read properties of undefined (reading 'complete')
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:132:20)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Navigation Methods should navigate from menu with external URL FAILED
-        TypeError: Cannot redefine property: location
-            at Function.defineProperty (<anonymous>)
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:71:12)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-        TypeError: Cannot read properties of undefined (reading 'complete')
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:132:20)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Navigation Methods should navigate from menu with internal URL FAILED
-        TypeError: Cannot redefine property: location
-            at Function.defineProperty (<anonymous>)
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:71:12)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-        TypeError: Cannot read properties of undefined (reading 'complete')
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:132:20)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent Navigation Methods should navigate to POS using router FAILED
-        TypeError: Cannot redefine property: location
-            at Function.defineProperty (<anonymous>)
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:71:12)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-        TypeError: Cannot read properties of undefined (reading 'complete')
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:132:20)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-Chrome Headless 131.0.0.0 (Windows 10) NavBarComponent should create FAILED
-        TypeError: Cannot redefine property: location
-            at Function.defineProperty (<anonymous>)
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:71:12)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-        TypeError: Cannot read properties of undefined (reading 'complete')
-            at UserContext.apply (src/app/layout/nav-bar/nav-bar.component.spec.ts:132:20)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:369:28)
-            at ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2081:39)
-            at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:368:34)
-            at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:111:43)
-            at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-            at UserContext.<anonymous> (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-            at <Jasmine>
-Chrome Headless 131.0.0.0 (Windows 10): Executed 109 of 109 (14 FAILED) (5.068 secs / 4.392 secs)
-TOTAL: 14 FAILED, 95 SUCCESS
+Error: src/app/shared/components/eclipse-athena-dialog/eclipse-athena-dialog.component.spec.ts:15:67 - error TS2344: Type '"getDetailsData"' does not satisfy the constraint 'keyof DetailsDataService'.
+
+15   let mockDetailsService: jasmine.SpyObj<Pick<DetailsDataService, 'getDetailsData'>>;
+                                                                     ~~~~~~~~~~~~~~~~
+
+
+Error: src/app/shared/components/eclipse-athena-dialog/eclipse-athena-dialog.component.spec.ts:17:63 - error TS2344: Type '"downloadFile"' does not satisfy the constraint 'keyof UtilityService'.
+
+17   let mockUtilityService: jasmine.SpyObj<Pick<UtilityService, 'downloadFile'>>;
+                                                                 ~~~~~~~~~~~~~~
+
+
+Error: src/app/shared/components/eclipse-athena-dialog/eclipse-athena-dialog.component.spec.ts:46:5 - error TS18046: 'mockDetailsService.getDetailsData' is of type 'unknown'.
+
+46     mockDetailsService.getDetailsData.and.returnValue(of([{ label: 'Status', value: 'OK' }]));
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/shared/components/eclipse-athena-dialog/eclipse-athena-dialog.component.spec.ts:47:15 - error TS2339: Property 'ngOnInit' does not exist on type 'EclipseAthenaDialogComponent'.
+
+47     component.ngOnInit();
+                 ~~~~~~~~
+
+
+Error: src/app/shared/components/eclipse-athena-dialog/eclipse-athena-dialog.component.spec.ts:59:5 - error TS18046: 'mockDetailsService.getDetailsData' is of type 'unknown'.
+
+59     mockDetailsService.getDetailsData.and.returnValue(of(mockData));
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/shared/components/eclipse-athena-dialog/eclipse-athena-dialog.component.spec.ts:69:5 - error TS18046: 'mockDetailsService.getDetailsData' is of type 'unknown'.
+
+69     mockDetailsService.getDetailsData.and.returnValue(throwError(() => new Error('Failure')));
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Error: src/app/shared/components/eclipse-athena-dialog/eclipse-athena-dialog.component.spec.ts:76:21 - error TS2339: Property 'closeDialog' does not exist on type 'EclipseAthenaDialogComponent'.
+
+76     spyOn(component.closeDialog, 'emit');
+                       ~~~~~~~~~~~
+
+
+Error: src/app/shared/components/eclipse-athena-dialog/eclipse-athena-dialog.component.spec.ts:78:22 - error TS2339: Property 'closeDialog' does not exist on type 'EclipseAthenaDialogComponent'.
+
+78     expect(component.closeDialog.emit).toHaveBeenCalled();
+                        ~~~~~~~~~~~
+
+
+Error: src/app/shared/components/eclipse-athena-dialog/eclipse-athena-dialog.component.spec.ts:82:21 - error TS2339: Property 'closeDialog' does not exist on type 'EclipseAthenaDialogComponent'.
+
+82     spyOn(component.closeDialog, 'emit');
+                       ~~~~~~~~~~~
+
+
+Error: src/app/shared/components/eclipse-athena-dialog/eclipse-athena-dialog.component.spec.ts:84:22 - error TS2339: Property 'closeDialog' does not exist on type 'EclipseAthenaDialogComponent'.
+
+84     expect(component.closeDialog.emit).toHaveBeenCalled();
 });
