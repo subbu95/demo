@@ -1,379 +1,377 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { NavBarComponent } from './nav-bar.component';
-import { MenuService } from '../../services/menu.service';
-import { SharedService } from '../../services/shared.service';
-import { SessionStorageService } from '../../services/session-storage.service';
-import { LoaderService } from '../../services/loader.service';
-import { CookieService } from 'ngx-cookie-service';
-import { UtilityService } from '../../services/utility.service';
-import { Router } from '@angular/router';
-import { LegacyComponentService } from '../../services/legacy-component.service';
-import { MenuKeys } from '../../models/common/menu-model';
-import { SessionKeys } from '../../models/common/login-model';
-import { of, throwError, Subject } from 'rxjs';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { TruncatePipe } from '../../shared/pipe/truncate.pipe';
-import { OverlayModule } from '@angular/cdk/overlay';
+import { EclipseAthenaDialogComponent } from './eclipse-athena-dialog.component';
+import { DialogModule, DialogComponent, IconModule, TabModule, CalloutModule, IconButtonModule, SnackbarService } from '@nielseniq/athena-core';
 import { CommonModule } from '@angular/common';
-import { IconModule, ItemModule, MenuModule, TabModule, TooltipModule } from '@nielseniq/athena-core';
-import { MenuResponse, MenuItem, SubMenuItem, LanguageMenuItem } from '../../models/common/menu-model';
-import { environment } from '../../../environments/environment';
+import { DetailsDataService } from '../../../services/details-data.service';
+import { LoaderService } from '../../../services/loader.service';
+import { UtilityService } from '../../../services/utility.service';
+import { of, throwError } from 'rxjs';
+import { CONSTANTS } from '../../../../assets/app.constants';
+import { saveAs } from 'file-saver';
+import { JobLogDataModel } from '../../../models/fup/job-log.model';
+import { DetailsModel } from '../../../models/fup/details.model';
+import { Result } from '../../../models/common/result.model';
 
-describe('NavBarComponent', () => {
-  let component: NavBarComponent;
-  let fixture: ComponentFixture<NavBarComponent>;
-  let mockMenuService: jasmine.SpyObj<MenuService>;
-  let mockSharedService: jasmine.SpyObj<SharedService>;
-  let mockSessionStorageService: jasmine.SpyObj<SessionStorageService>;
-  let mockLoaderService: jasmine.SpyObj<LoaderService>;
-  let mockCookieService: jasmine.SpyObj<CookieService>;
-  let mockUtilityService: jasmine.SpyObj<UtilityService>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockLegacyComponentService: jasmine.SpyObj<LegacyComponentService>;
-  let messageSubject: Subject<boolean>;
-  let updateInstMenuSubject: Subject<SubMenuItem[]>;
+jest.mock('file-saver', () => ({
+  saveAs: jest.fn()
+}));
 
-  const mockMenuResponse: MenuResponse = {
-    [MenuKeys.INSTRUCTIONS]: [{ menuItemName: 'Test', url: '/test' }],
-    [MenuKeys.LANGUAGE]: [{ languageName: 'English', url: '', lanCode: 'en' }],
-    [MenuKeys.MADRAS]: { url: 'http://madras.com' },
-    [MenuKeys.REFERENTIAL]: { url: 'http://referential.com' },
-    [MenuKeys.DATASCOPES]: { url: 'http://datascopes.com' },
-    [MenuKeys.DATA_MAINTENANCE]: { url: 'http://data-maintenance.com' },
-    [MenuKeys.FOLLOW_UP]: { url: 'http://follow-up.com' },
-    [MenuKeys.DEVELOPMENT]: [],
-    [MenuKeys.ADMINISTRATION]: [],
-    [MenuKeys.GUIDELINES]: [],
-    [MenuKeys.POS]: { url: '/pos' }
+describe('EclipseAthenaDialogComponent', () => {
+  let component: EclipseAthenaDialogComponent;
+  let fixture: ComponentFixture<EclipseAthenaDialogComponent>;
+  let mockDetailsDataService: Partial<DetailsDataService>;
+  let mockLoaderService: Partial<LoaderService>;
+  let mockUtilityService: Partial<UtilityService>;
+  let mockSnackbarService: Partial<SnackbarService>;
+
+  const mockJobLogData: JobLogDataModel = {
+    status: {
+      timestamp: '2023-01-01',
+      responseStatus: 'OK',
+      responseCode: '200'
+    },
+    body: {
+      company: 'Test Company',
+      node: 'Test Node',
+      uproc: 'Test Uproc',
+      session: 'Test Session',
+      management_Unit: 'Test Unit',
+      uproc_number: 123,
+      session_number: 456,
+      launch: 'Test Launch',
+      monId: 789,
+      logContent: 'Test log content',
+      isTruncated: true
+    }
   };
 
-  beforeEach(() => {
-    // Initialize subjects
-    messageSubject = new Subject<boolean>();
-    updateInstMenuSubject = new Subject<SubMenuItem[]>();
+  const mockDetailsData: DetailsModel = {
+    status: {
+      timestamp: '2023-01-01',
+      responseStatus: 'OK',
+      responseCode: '200'
+    },
+    body: {
+      session: 'Test Session',
+      week: 'Test Week',
+      step: 'Test Step',
+      status: 'OK',
+      result: 'SUCCESS',
+      execution_server: 'Test Server',
+      unix_process: '12345',
+      job_id: 'JOB123',
+      management_unit: 'Test Unit',
+      command_line: 'test command'
+    }
+  };
 
-    // Create spies for window methods
-    spyOn(window, 'open').and.stub();
+  beforeEach(async () => {
+    mockDetailsDataService = {
+      getJobLogDetails: jest.fn().mockReturnValue(of(mockJobLogData)),
+      getJobDetails: jest.fn().mockReturnValue(of(mockDetailsData)),
+      downloadFile: jest.fn().mockReturnValue(of(new Blob(['test content'])))
+    };
 
-    mockMenuService = jasmine.createSpyObj('MenuService', ['getMenus', 'getInstructionMenu']);
-    mockSharedService = jasmine.createSpyObj('SharedService', ['updateInstructionsMenu', 'userLogout'], {
-      updateInstMenu$: updateInstMenuSubject.asObservable()
-    });
-    mockSessionStorageService = jasmine.createSpyObj('SessionStorageService', ['get', 'set', 'clear']);
-    mockLoaderService = jasmine.createSpyObj('LoaderService', ['showLoader', 'hideLoader']);
-    mockCookieService = jasmine.createSpyObj('CookieService', ['set']);
-    mockUtilityService = jasmine.createSpyObj('UtilityService', ['openSnackBar']);
-    mockRouter = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl']);
-    mockLegacyComponentService = jasmine.createSpyObj('LegacyComponentService', [], { 
-      message$: messageSubject.asObservable(),
-      legacyUrl: { next: jasmine.createSpy() }
-    });
+    mockLoaderService = {
+      getNIQLoader: jest.fn().mockReturnValue('loader-image-path')
+    };
 
-    TestBed.configureTestingModule({
+    mockUtilityService = {
+      openSnackBar: jest.fn()
+    };
+
+    mockSnackbarService = {
+      open: jest.fn()
+    };
+
+    await TestBed.configureTestingModule({
       imports: [
         CommonModule,
-        OverlayModule,
+        DialogModule,
         IconModule,
         TabModule,
-        MenuModule,
-        ItemModule,
-        TooltipModule,
-        NavBarComponent,
-        TruncatePipe
+        CalloutModule,
+        IconButtonModule
       ],
+      declarations: [EclipseAthenaDialogComponent],
       providers: [
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-        { provide: MenuService, useValue: mockMenuService },
-        { provide: SharedService, useValue: mockSharedService },
-        { provide: SessionStorageService, useValue: mockSessionStorageService },
+        { provide: DetailsDataService, useValue: mockDetailsDataService },
         { provide: LoaderService, useValue: mockLoaderService },
-        { provide: CookieService, useValue: mockCookieService },
         { provide: UtilityService, useValue: mockUtilityService },
-        { provide: Router, useValue: mockRouter },
-        { provide: LegacyComponentService, useValue: mockLegacyComponentService }
+        { provide: SnackbarService, useValue: mockSnackbarService }
       ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(NavBarComponent);
+    fixture = TestBed.createComponent(EclipseAthenaDialogComponent);
     component = fixture.componentInstance;
-
-    mockMenuService.getMenus.and.returnValue(of(mockMenuResponse));
-    mockSessionStorageService.get.and.returnValue('en');
-
+    component.title = 'Test Title';
+    component.monId = 123;
+    component.detailsPath = 'test/path';
     fixture.detectChanges();
-  });
-
-  afterEach(() => {
-    // Clean up subjects
-    messageSubject.complete();
-    updateInstMenuSubject.complete();
-    
-    // Reset all spies
-    (window.open as jasmine.Spy).calls.reset();
-    fixture.destroy();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('Menu Initialization', () => {
-    it('should load menu data on initialization', fakeAsync(() => {
-      mockMenuService.getMenus.and.returnValue(of(mockMenuResponse));
-      component.getMenuData();
-      tick();
-      
-      expect(mockMenuService.getMenus).toHaveBeenCalled();
-      expect(component.data).toEqual(mockMenuResponse);
-    }));
-
-    it('should handle menu loading errors', fakeAsync(() => {
-      const errorResponse = { error: { message: 'Error loading menu' } };
-      mockMenuService.getMenus.and.returnValue(throwError(() => errorResponse));
-      
-      component.getMenuData();
-      tick();
-      
-      expect(mockUtilityService.openSnackBar).toHaveBeenCalled();
-    }));
+  it('should initialize with correct default values', () => {
+    expect(component.primaryTabTitle).toBe(CONSTANTS.PRIMARY_TAB_TITLE);
+    expect(component.secondaryTabTitle).toBe(CONSTANTS.SECONDARY_TAB_TITLE);
+    expect(component.tabSelected).toBe(component.primaryTab);
+    expect(component.genericErrMsg).toBe(CONSTANTS.ERROR_MESSAGES.GENERIC_DATA_MESSAGE);
+    expect(component.NIQLoaderImage).toBe('loader-image-path');
   });
 
-  describe('Keyboard Navigation', () => {
-    const testMenuItems: MenuItem[] = [
-      { menuItemName: 'Item 1', url: '/item1' },
-      { 
-        menuItemName: 'Item 2', 
-        url: '', 
-        children: [
-          { menuItemName: 'Subitem', url: '/subitem' }
-        ] 
-      }
-    ];
-
-    beforeEach(() => {
-      component.currentMenu = testMenuItems;
-      component.isDropdownOpen = true;
-    });
-
-    it('should navigate down with ArrowDown', () => {
-      const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
-      component.navigate(event);
-      expect(component.activeIndex).toBe(1);
-    });
-
-    it('should navigate up with ArrowUp', () => {
-      component.activeIndex = 1;
-      const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
-      component.navigate(event);
-      expect(component.activeIndex).toBe(0);
-    });
-
-    it('should open submenu with ArrowRight or Enter', () => {
-      component.activeIndex = 1; // Point to Item 2 which has children
-      spyOn(component, 'openSubmenu');
+  describe('openDialog', () => {
+    it('should open dialog and load job log data', () => {
+      const openSpy = jest.spyOn(component.dialogBox, 'open');
+      component.openDialog(123);
       
-      const rightEvent = new KeyboardEvent('keydown', { key: 'ArrowRight' });
-      component.navigate(rightEvent);
-      
-      expect(component.openSubmenu).toHaveBeenCalledWith(testMenuItems[1], 1);
-    });
-
-    it('should go back with ArrowLeft', () => {
-      component.menuStack = [testMenuItems];
-      spyOn(component, 'goBack');
-      
-      const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
-      component.navigate(event);
-      
-      expect(component.goBack).toHaveBeenCalled();
-    });
-
-    it('should close dropdown with Escape', () => {
-      spyOn(component, 'closeDropdown');
-      const event = new KeyboardEvent('keydown', { key: 'Escape' });
-      component.handleGlobalKeyboard(event);
-      expect(component.closeDropdown).toHaveBeenCalled();
+      expect(openSpy).toHaveBeenCalled();
+      expect(component.isLoading).toBe(true);
+      expect(mockDetailsDataService.getJobLogDetails).toHaveBeenCalledWith(123);
     });
   });
 
-  describe('Menu Navigation', () => {
-    const parentItem: MenuItem = { 
-      menuItemName: 'Parent', 
-      url: '', 
-      children: [
-        { menuItemName: 'Child', url: '/child' }
-      ] 
-    };
+  describe('onCloseDialogEvent', () => {
+    it('should reset API call flags', () => {
+      component.isDetailsAPICalled = true;
+      component.isJobLogAPICalled = true;
+      
+      component.onCloseDialogEvent();
+      
+      expect(component.isDetailsAPICalled).toBe(false);
+      expect(component.isJobLogAPICalled).toBe(false);
+    });
+  });
 
-    beforeEach(() => {
-      component.data = {
-        ...mockMenuResponse,
-        [MenuKeys.INSTRUCTIONS]: [parentItem]
+  describe('onDialogCloseIconClick', () => {
+    it('should reset API call flags', () => {
+      component.isDetailsAPICalled = true;
+      component.isJobLogAPICalled = true;
+      
+      component.onDialogCloseIconClick();
+      
+      expect(component.isDetailsAPICalled).toBe(false);
+      expect(component.isJobLogAPICalled).toBe(false);
+    });
+  });
+
+  describe('onSelectedChange', () => {
+    it('should load details data when secondary tab is selected', () => {
+      component.onSelectedChange(component.secondaryTab, 123);
+      
+      expect(component.tabSelected).toBe(component.secondaryTab);
+      expect(component.isPrimaryTabActive).toBe(false);
+      expect(component.isSecondaryTabActive).toBe(true);
+      expect(mockDetailsDataService.getJobDetails).toHaveBeenCalledWith(123, 'test/path');
+    });
+
+    it('should not call details API if already called', () => {
+      component.isDetailsAPICalled = true;
+      component.onSelectedChange(component.secondaryTab, 123);
+      
+      expect(mockDetailsDataService.getJobDetails).not.toHaveBeenCalled();
+    });
+
+    it('should load job log data when primary tab is selected', () => {
+      component.onSelectedChange(component.primaryTab, 123);
+      
+      expect(component.tabSelected).toBe(component.primaryTab);
+      expect(component.isPrimaryTabActive).toBe(true);
+      expect(component.isSecondaryTabActive).toBe(false);
+      expect(mockDetailsDataService.getJobLogDetails).toHaveBeenCalledWith(123);
+    });
+
+    it('should not call job log API if already called', () => {
+      component.isJobLogAPICalled = true;
+      component.onSelectedChange(component.primaryTab, 123);
+      
+      expect(mockDetailsDataService.getJobLogDetails).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('getDetailsData', () => {
+    it('should populate detailsData correctly', fakeAsync(() => {
+      component.getDetailsData();
+      tick();
+      
+      expect(component.detailsData.length).toBeGreaterThan(0);
+      expect(component.detailsData[0]).toEqual({
+        label: 'Session',
+        value: 'Test Session'
+      });
+      expect(component.isDetailsAPICalled).toBe(true);
+      expect(component.isLoading).toBe(false);
+    }));
+
+    it('should handle error when getting details data', fakeAsync(() => {
+      const errorResponse = {
+        error: {
+          status: {
+            errors: [{
+              code: '500',
+              message: 'Test Error'
+            }],
+            responseStatus: 'ERROR'
+          }
+        }
       };
-    });
-
-    it('should open main menu', () => {
-      const mockButton = {} as any;
-      component.openMainMenu(MenuKeys.INSTRUCTIONS, mockButton);
+      (mockDetailsDataService.getJobDetails as jest.Mock).mockReturnValue(throwError(() => errorResponse));
       
-      expect(component.isDropdownOpen).toBeTrue();
-      expect(component.currentMenu).toEqual([parentItem]);
-    });
-
-    it('should open submenu', () => {
-      component.currentMenu = [parentItem];
-      component.openSubmenu(parentItem, 0);
-      
-      expect(component.menuStack.length).toBe(1);
-      expect(component.currentMenu).toEqual(parentItem.children);
-    });
-
-    it('should go back to previous menu', () => {
-      component.currentMenu = [parentItem];
-      component.openSubmenu(parentItem, 0);
-      component.goBack();
-      
-      expect(component.menuStack.length).toBe(0);
-      expect(component.currentMenu).toEqual([parentItem]);
-    });
-
-    it('should close dropdown', () => {
-      component.isDropdownOpen = true;
-      component.closeDropdown();
-      
-      expect(component.isDropdownOpen).toBeFalse();
-      expect(component.menuStack).toEqual([]);
-    });
-  });
-
-  describe('Navigation Methods', () => {
-    it('should redirect to dashboard', () => {
-      component.redirectToDashboard();
-      expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/dashboard');
-    });
-
-    it('should redirect to external URL using window.open', () => {
-      const externalUrl = 'http://external.com';
-      component.data = {
-        ...mockMenuResponse,
-        [MenuKeys.MADRAS]: { url: externalUrl }
-      };
-      
-      component.redirectToExternal(MenuKeys.MADRAS);
-      expect(window.open).toHaveBeenCalledWith(externalUrl, '_blank');
-    });
-
-    it('should navigate to POS using router', () => {
-      component.data = {
-        ...mockMenuResponse,
-        [MenuKeys.POS]: { url: '/pos' }
-      };
-      
-      component.redirectToExternal(MenuKeys.POS);
-      expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/pos');
-    });
-
-    it('should set language', () => {
-      component.data = mockMenuResponse;
-      
-      component.setLanguage('en');
-      
-      expect(mockSessionStorageService.set).toHaveBeenCalledWith(SessionKeys.LANGUAGE_CODE, 'en');
-      expect(mockCookieService.set).toHaveBeenCalled();
-      expect(component.selectedLanguage).toBe('English');
-      expect(component.isDropdownOpen).toBeFalse();
-    });
-
-    it('should navigate from menu with legacy URL', fakeAsync(() => {
-      const legacyUrl = 'legacy.action';
-      spyOn(component, 'closeDropdown');
-      spyOn(component, 'resetMenu');
-      
-      component.navigateFromMenu(legacyUrl);
+      component.getDetailsData();
       tick();
       
-      expect(component.closeDropdown).toHaveBeenCalled();
-      expect(component.resetMenu).toHaveBeenCalled();
-      expect(mockLegacyComponentService.legacyUrl.next).toHaveBeenCalledWith(`${environment.kawaURL}${legacyUrl}`);
-      expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/legacy', jasmine.any(Object));
-    }));
-
-    it('should navigate from menu with external URL', () => {
-      const externalUrl = 'http://external.com';
-      spyOn(component, 'closeDropdown');
-      spyOn(component, 'resetMenu');
-      
-      component.navigateFromMenu(externalUrl);
-      
-      expect(component.closeDropdown).toHaveBeenCalled();
-      expect(component.resetMenu).toHaveBeenCalled();
-      expect(window.open).toHaveBeenCalledWith(externalUrl, '_blank');
-    });
-
-    it('should navigate from menu with internal URL', () => {
-      const internalUrl = '/internal';
-      spyOn(component, 'closeDropdown');
-      spyOn(component, 'resetMenu');
-      
-      component.navigateFromMenu(internalUrl);
-      
-      expect(component.closeDropdown).toHaveBeenCalled();
-      expect(component.resetMenu).toHaveBeenCalled();
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/internal']);
-    });
-  });
-
-  describe('User Actions', () => {
-    it('should logout user', fakeAsync(() => {
-      const mockEvent = new Event('click');
-      mockSharedService.userLogout.and.returnValue(of(null));
-      
-      component.userLogout(mockEvent);
-      tick();
-      
-      expect(mockLoaderService.showLoader).toHaveBeenCalled();
-      expect(mockSharedService.userLogout).toHaveBeenCalled();
-      expect(mockLoaderService.hideLoader).toHaveBeenCalled();
+      expect(component.isLoading).toBe(false);
+      expect(component.isSecondaryTabActive).toBe(false);
+      expect(component.hasError).toBe(true);
+      expect(component.errorCode).toBe('500 ERROR');
+      expect(component.errorMessage).toBe('Test Error');
     }));
   });
 
-  describe('Lifecycle Hooks', () => {
-    it('should unsubscribe from subscriptions on destroy', () => {
-      const testSub = new Subject().subscribe();
-      component.subscription.add(testSub);
+  describe('getJobLogData', () => {
+    it('should populate job log data correctly', fakeAsync(() => {
+      component.getJobLogData(123);
+      tick();
       
-      spyOn(component.subscription, 'unsubscribe');
+      expect(component.logArray1.length).toBeGreaterThan(0);
+      expect(component.logArray2.length).toBeGreaterThan(0);
+      expect(component.logContent).toBe('Test log content');
+      expect(component.isLogTruncated).toBe(true);
+      expect(component.isJobLogAPICalled).toBe(true);
+      expect(component.isLoading).toBe(false);
+    }));
+
+    it('should handle empty response body', fakeAsync(() => {
+      const emptyResponse: JobLogDataModel = {
+        status: {
+          timestamp: '2023-01-01',
+          responseStatus: 'OK',
+          responseCode: '200'
+        },
+        body: null as any
+      };
+      (mockDetailsDataService.getJobLogDetails as jest.Mock).mockReturnValue(of(emptyResponse));
+      
+      component.getJobLogData(123);
+      tick();
+      
+      expect(component.hasError).toBe(true);
+      expect(component.errorCode).toBe('200');
+      expect(component.errorMessage).toBe('Something went wrong, Empty response received');
+    }));
+
+    it('should handle error when getting job log data', fakeAsync(() => {
+      const errorResponse = {
+        error: {
+          status: {
+            errors: [{
+              code: '404',
+              message: 'Not Found'
+            }],
+            responseStatus: 'ERROR'
+          }
+        }
+      };
+      (mockDetailsDataService.getJobLogDetails as jest.Mock).mockReturnValue(throwError(() => errorResponse));
+      
+      component.getJobLogData(123);
+      tick();
+      
+      expect(component.isLoading).toBe(false);
+      expect(component.isPrimaryTabActive).toBe(false);
+      expect(component.hasError).toBe(true);
+      expect(component.errorCode).toBe('404');
+      expect(component.errorMessage).toBe('Not Found');
+    }));
+
+    it('should handle generic error when error structure is unexpected', fakeAsync(() => {
+      (mockDetailsDataService.getJobLogDetails as jest.Mock).mockReturnValue(throwError(() => new Error('Test Error')));
+      
+      component.getJobLogData(123);
+      tick();
+      
+      expect(component.errorCode).toBe('500');
+      expect(component.errorMessage).toBe('Something went wrong, please contact support team');
+    }));
+  });
+
+  describe('downloadFile', () => {
+    it('should download file successfully', fakeAsync(() => {
+      component.sessionName = 'TestSession';
+      component.uproc = 'TestUproc';
+      component.monId = 123;
+      
+      component.downloadFile();
+      tick();
+      
+      expect(mockDetailsDataService.downloadFile).toHaveBeenCalledWith(123, 'TestSession', 'TestUproc');
+      expect(saveAs).toHaveBeenCalled();
+      expect(mockUtilityService.openSnackBar).toHaveBeenCalledWith(
+        'large',
+        'success',
+        'File downloading begins.It will take few minutes.',
+        'success'
+      );
+    }));
+
+    it('should handle download error with specific error message', fakeAsync(() => {
+      const errorResponse = {
+        error: {
+          error: 'Download failed'
+        }
+      };
+      (mockDetailsDataService.downloadFile as jest.Mock).mockReturnValue(throwError(() => errorResponse));
+      
+      component.downloadFile();
+      tick();
+      
+      expect(mockSnackbarService.open).toHaveBeenCalledWith(
+        'large',
+        'error',
+        'Download failed',
+        'download',
+        { dismissAfter: 4000 }
+      );
+    }));
+
+    it('should handle download error with generic error message', fakeAsync(() => {
+      (mockDetailsDataService.downloadFile as jest.Mock).mockReturnValue(throwError(() => new Error('Test Error')));
+      
+      component.downloadFile();
+      tick();
+      
+      expect(mockSnackbarService.open).toHaveBeenCalledWith(
+        'large',
+        'error',
+        CONSTANTS.ERROR_MESSAGES.GENERIC_DOWNLOAD_MESSAGE,
+        'download',
+        { dismissAfter: 4000 }
+      );
+    }));
+  });
+
+  describe('resetEclipseDialog', () => {
+    it('should reset component state and unsubscribe', () => {
+      const unsubscribeSpy = jest.spyOn(component.stepDetailsSubscription, 'unsubscribe');
+      
+      component.resetEclipseDialog();
+      
+      expect(component.isDetailsAPICalled).toBe(false);
+      expect(component.isJobLogAPICalled).toBe(false);
+      expect(component.isLoading).toBe(false);
+      expect(unsubscribeSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('ngOnDestroy', () => {
+    it('should call resetEclipseDialog', () => {
+      const resetSpy = jest.spyOn(component, 'resetEclipseDialog');
+      
       component.ngOnDestroy();
       
-      expect(component.subscription.unsubscribe).toHaveBeenCalled();
-      expect(testSub.closed).toBeTrue();
-    });
-  });
-
-  describe('Language Menu', () => {
-    it('should open language menu', () => {
-      const mockButton = {} as any;
-      component.openMainMenu(MenuKeys.LANGUAGE, mockButton);
-      
-      expect(component.isDropdownOpen).toBeTrue();
-      expect(component.isLanguageMenu).toBeTrue();
-      expect(component.currentLanguageMenu).toEqual(mockMenuResponse[MenuKeys.LANGUAGE]);
-    });
-
-    it('should set language and update UI', () => {
-      const languageItems: LanguageMenuItem[] = [
-        { languageName: 'English', url: '', lanCode: 'en' },
-        { languageName: 'French', url: '', lanCode: 'fr' }
-      ];
-      component.data[MenuKeys.LANGUAGE] = languageItems;
-      
-      component.setLanguage('fr');
-      
-      expect(component.selectedLanguage).toBe('French');
-      expect(mockSessionStorageService.set).toHaveBeenCalledWith(SessionKeys.LANGUAGE_CODE, 'fr');
-      expect(mockCookieService.set).toHaveBeenCalled();
+      expect(resetSpy).toHaveBeenCalled();
     });
   });
 });
