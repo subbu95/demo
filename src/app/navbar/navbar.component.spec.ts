@@ -380,3 +380,206 @@ describe('EclipseAthenaDialogComponent', () => {
     });
   });
 });
+
+
+
+
+////////////////////////cevwrvervefv
+
+
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { EclipseAthenaDialogComponent } from './eclipse-athena-dialog.component';
+import { DialogModule, DialogComponent, IconModule, TabModule, CalloutModule, IconButtonModule, SnackbarService } from '@nielseniq/athena-core';
+import { CommonModule } from '@angular/common';
+import { DetailsDataService } from '../../../services/details-data.service';
+import { LoaderService } from '../../../services/loader.service';
+import { UtilityService } from '../../../services/utility.service';
+import { of, throwError } from 'rxjs';
+import { CONSTANTS } from '../../../../assets/app.constants';
+import { JobLogDataModel } from '../../../models/fup/job-log.model';
+import { DetailsModel } from '../../../models/fup/details.model';
+import { Result } from '../../../models/common/result.model';
+import * as FileSaver from 'file-saver';
+
+// Mock file-saver
+jest.mock('file-saver', () => ({
+  saveAs: jest.fn()
+}));
+
+describe('EclipseAthenaDialogComponent', () => {
+  let component: EclipseAthenaDialogComponent;
+  let fixture: ComponentFixture<EclipseAthenaDialogComponent>;
+  let detailsDataService: jasmine.SpyObj<DetailsDataService>;
+  let loaderService: jasmine.SpyObj<LoaderService>;
+  let utilityService: jasmine.SpyObj<UtilityService>;
+  let snackbarService: jasmine.SpyObj<SnackbarService>;
+
+  const mockJobLogData: JobLogDataModel = {
+    status: {
+      timestamp: '2023-01-01',
+      responseStatus: 'OK',
+      responseCode: '200'
+    },
+    body: {
+      company: 'Test Company',
+      node: 'Test Node',
+      uproc: 'Test Uproc',
+      session: 'Test Session',
+      management_Unit: 'Test Unit',
+      uproc_number: 123,
+      session_number: 456,
+      launch: 'Test Launch',
+      monId: 789,
+      logContent: 'Test log content',
+      isTruncated: true
+    }
+  };
+
+  const mockDetailsData: DetailsModel = {
+    status: {
+      timestamp: '2023-01-01',
+      responseStatus: 'OK',
+      responseCode: '200'
+    },
+    body: {
+      session: 'Test Session',
+      week: 'Test Week',
+      step: 'Test Step',
+      status: 'OK',
+      result: 'SUCCESS',
+      execution_server: 'Test Server',
+      unix_process: '12345',
+      job_id: 'JOB123',
+      management_unit: 'Test Unit',
+      command_line: 'test command'
+    }
+  };
+
+  beforeEach(async () => {
+    // Create spy objects with proper typing
+    detailsDataService = jasmine.createSpyObj<DetailsDataService>('DetailsDataService', 
+      ['getJobLogDetails', 'getJobDetails', 'downloadFile']);
+    loaderService = jasmine.createSpyObj<LoaderService>('LoaderService', ['getNIQLoader']);
+    utilityService = jasmine.createSpyObj<UtilityService>('UtilityService', ['openSnackBar']);
+    snackbarService = jasmine.createSpyObj<SnackbarService>('SnackbarService', ['open']);
+
+    // Configure return values
+    detailsDataService.getJobLogDetails.and.returnValue(of(mockJobLogData));
+    detailsDataService.getJobDetails.and.returnValue(of(mockDetailsData));
+    detailsDataService.downloadFile.and.returnValue(of(new Blob(['test content'])));
+    loaderService.getNIQLoader.and.returnValue('loader-image-path');
+
+    await TestBed.configureTestingModule({
+      imports: [
+        CommonModule,
+        DialogModule,
+        IconModule,
+        TabModule,
+        CalloutModule,
+        IconButtonModule
+      ],
+      declarations: [EclipseAthenaDialogComponent],
+      providers: [
+        { provide: DetailsDataService, useValue: detailsDataService },
+        { provide: LoaderService, useValue: loaderService },
+        { provide: UtilityService, useValue: utilityService },
+        { provide: SnackbarService, useValue: snackbarService }
+      ]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(EclipseAthenaDialogComponent);
+    component = fixture.componentInstance;
+    
+    // Initialize required inputs
+    component.title = 'Test Title';
+    component.monId = 123;
+    component.detailsPath = 'test/path';
+    
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should initialize with correct default values', () => {
+    expect(component.primaryTabTitle).toBe(CONSTANTS.PRIMARY_TAB_TITLE);
+    expect(component.secondaryTabTitle).toBe(CONSTANTS.SECONDARY_TAB_TITLE);
+    expect(component.tabSelected).toBe(component.primaryTab);
+    expect(component.genericErrMsg).toBe(CONSTANTS.ERROR_MESSAGES.GENERIC_DATA_MESSAGE);
+    expect(component.NIQLoaderImage).toBe('loader-image-path');
+  });
+
+  describe('openDialog', () => {
+    it('should open dialog and load job log data', () => {
+      // Need to initialize ViewChild first
+      component.dialogBox = TestBed.createComponent(DialogComponent).componentInstance;
+      const openSpy = spyOn(component.dialogBox, 'open');
+      
+      component.openDialog(123);
+      
+      expect(openSpy).toHaveBeenCalled();
+      expect(component.isLoading).toBe(true);
+      expect(detailsDataService.getJobLogDetails).toHaveBeenCalledWith(123);
+    });
+  });
+
+  // ... (keep all other test cases the same as before)
+
+  describe('downloadFile', () => {
+    it('should download file successfully', fakeAsync(() => {
+      component.sessionName = 'TestSession';
+      component.uproc = 'TestUproc';
+      component.monId = 123;
+      
+      component.downloadFile();
+      tick();
+      
+      expect(detailsDataService.downloadFile).toHaveBeenCalledWith(123, 'TestSession', 'TestUproc');
+      expect(FileSaver.saveAs).toHaveBeenCalled();
+      expect(utilityService.openSnackBar).toHaveBeenCalledWith(
+        'large',
+        'success',
+        'File downloading begins.It will take few minutes.',
+        'success'
+      );
+    }));
+
+    it('should handle download error with specific error message', fakeAsync(() => {
+      const errorResponse = {
+        error: {
+          error: 'Download failed'
+        }
+      };
+      detailsDataService.downloadFile.and.returnValue(throwError(() => errorResponse));
+      
+      component.downloadFile();
+      tick();
+      
+      expect(snackbarService.open).toHaveBeenCalledWith(
+        'large',
+        'error',
+        'Download failed',
+        'download',
+        { dismissAfter: 4000 }
+      );
+    }));
+
+    it('should handle download error with generic error message', fakeAsync(() => {
+      detailsDataService.downloadFile.and.returnValue(throwError(() => new Error('Test Error')));
+      
+      component.downloadFile();
+      tick();
+      
+      expect(snackbarService.open).toHaveBeenCalledWith(
+        'large',
+        'error',
+        CONSTANTS.ERROR_MESSAGES.GENERIC_DOWNLOAD_MESSAGE,
+        'download',
+        { dismissAfter: 4000 }
+      );
+    }));
+  });
+
+  // ... (keep remaining test cases the same)
+});
