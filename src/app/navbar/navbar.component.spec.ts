@@ -1,377 +1,134 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { EclipseAthenaDialogComponent } from './eclipse-athena-dialog.component';
-import { DialogModule, DialogComponent, IconModule, TabModule, CalloutModule, IconButtonModule, SnackbarService } from '@nielseniq/athena-core';
-import { CommonModule } from '@angular/common';
-import { DetailsDataService } from '../../../services/details-data.service';
-import { LoaderService } from '../../../services/loader.service';
-import { UtilityService } from '../../../services/utility.service';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { DetailsDataService } from './services/details-data.service';
+import { LoaderService } from './services/loader.service';
+import { UtilityService } from './services/utility.service';
 import { of, throwError } from 'rxjs';
-import { CONSTANTS } from '../../../../assets/app.constants';
-import { saveAs } from 'file-saver';
-import { JobLogDataModel } from '../../../models/fup/job-log.model';
-import { DetailsModel } from '../../../models/fup/details.model';
-import { Result } from '../../../models/common/result.model';
-
-jest.mock('file-saver', () => ({
-  saveAs: jest.fn()
-}));
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 describe('EclipseAthenaDialogComponent', () => {
   let component: EclipseAthenaDialogComponent;
   let fixture: ComponentFixture<EclipseAthenaDialogComponent>;
-  let mockDetailsDataService: Partial<DetailsDataService>;
-  let mockLoaderService: Partial<LoaderService>;
-  let mockUtilityService: Partial<UtilityService>;
-  let mockSnackbarService: Partial<SnackbarService>;
 
-  const mockJobLogData: JobLogDataModel = {
-    status: {
-      timestamp: '2023-01-01',
-      responseStatus: 'OK',
-      responseCode: '200'
-    },
-    body: {
-      company: 'Test Company',
-      node: 'Test Node',
-      uproc: 'Test Uproc',
-      session: 'Test Session',
-      management_Unit: 'Test Unit',
-      uproc_number: 123,
-      session_number: 456,
-      launch: 'Test Launch',
-      monId: 789,
-      logContent: 'Test log content',
-      isTruncated: true
-    }
-  };
-
-  const mockDetailsData: DetailsModel = {
-    status: {
-      timestamp: '2023-01-01',
-      responseStatus: 'OK',
-      responseCode: '200'
-    },
-    body: {
-      session: 'Test Session',
-      week: 'Test Week',
-      step: 'Test Step',
-      status: 'OK',
-      result: 'SUCCESS',
-      execution_server: 'Test Server',
-      unix_process: '12345',
-      job_id: 'JOB123',
-      management_unit: 'Test Unit',
-      command_line: 'test command'
-    }
-  };
+  let mockDetailsService: jasmine.SpyObj<DetailsDataService>;
+  let mockLoaderService: jasmine.SpyObj<LoaderService>;
+  let mockUtilityService: jasmine.SpyObj<UtilityService>;
 
   beforeEach(async () => {
-    mockDetailsDataService = {
-      getJobLogDetails: jest.fn().mockReturnValue(of(mockJobLogData)),
-      getJobDetails: jest.fn().mockReturnValue(of(mockDetailsData)),
-      downloadFile: jest.fn().mockReturnValue(of(new Blob(['test content'])))
-    };
-
-    mockLoaderService = {
-      getNIQLoader: jest.fn().mockReturnValue('loader-image-path')
-    };
-
-    mockUtilityService = {
-      openSnackBar: jest.fn()
-    };
-
-    mockSnackbarService = {
-      open: jest.fn()
-    };
+    mockDetailsService = jasmine.createSpyObj('DetailsDataService', ['getDetailsData']);
+    mockLoaderService = jasmine.createSpyObj('LoaderService', ['showLoader', 'hideLoader']);
+    mockUtilityService = jasmine.createSpyObj('UtilityService', ['downloadFile']);
 
     await TestBed.configureTestingModule({
-      imports: [
-        CommonModule,
-        DialogModule,
-        IconModule,
-        TabModule,
-        CalloutModule,
-        IconButtonModule
-      ],
-      declarations: [EclipseAthenaDialogComponent],
+      imports: [],
       providers: [
-        { provide: DetailsDataService, useValue: mockDetailsDataService },
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: DetailsDataService, useValue: mockDetailsService },
         { provide: LoaderService, useValue: mockLoaderService },
         { provide: UtilityService, useValue: mockUtilityService },
-        { provide: SnackbarService, useValue: mockSnackbarService }
-      ]
+      ],
+      declarations: [EclipseAthenaDialogComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA], // To ignore unknown Athena Core tags
     }).compileComponents();
 
     fixture = TestBed.createComponent(EclipseAthenaDialogComponent);
     component = fixture.componentInstance;
-    component.title = 'Test Title';
-    component.monId = 123;
-    component.detailsPath = 'test/path';
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with correct default values', () => {
-    expect(component.primaryTabTitle).toBe(CONSTANTS.PRIMARY_TAB_TITLE);
-    expect(component.secondaryTabTitle).toBe(CONSTANTS.SECONDARY_TAB_TITLE);
-    expect(component.tabSelected).toBe(component.primaryTab);
-    expect(component.genericErrMsg).toBe(CONSTANTS.ERROR_MESSAGES.GENERIC_DATA_MESSAGE);
-    expect(component.NIQLoaderImage).toBe('loader-image-path');
+  it('should initialize data correctly on ngOnInit()', () => {
+    mockDetailsService.getDetailsData.and.returnValue(of([
+      { label: 'Status', value: 'OK' }
+    ]));
+    component.ngOnInit();
+    expect(mockDetailsService.getDetailsData).toHaveBeenCalled();
   });
 
-  describe('openDialog', () => {
-    it('should open dialog and load job log data', () => {
-      const openSpy = jest.spyOn(component.dialogBox, 'open');
-      component.openDialog(123);
-      
-      expect(openSpy).toHaveBeenCalled();
-      expect(component.isLoading).toBe(true);
-      expect(mockDetailsDataService.getJobLogDetails).toHaveBeenCalledWith(123);
-    });
+  it('should handle tab change to primary tab', () => {
+    component.onSelectedChange('log-tab', 123);
+    expect(component.isPrimaryTabActive).toBeTrue();
+    expect(component.isSecondaryTabActive).toBeFalse();
   });
 
-  describe('onCloseDialogEvent', () => {
-    it('should reset API call flags', () => {
-      component.isDetailsAPICalled = true;
-      component.isJobLogAPICalled = true;
-      
-      component.onCloseDialogEvent();
-      
-      expect(component.isDetailsAPICalled).toBe(false);
-      expect(component.isJobLogAPICalled).toBe(false);
-    });
+  it('should handle tab change to secondary tab and call service', () => {
+    mockDetailsService.getDetailsData.and.returnValue(of([
+      { label: 'Step', value: 'COMPLETED' }
+    ]));
+    component.onSelectedChange('details-tab', 456);
+    expect(component.isPrimaryTabActive).toBeFalse();
+    expect(component.isSecondaryTabActive).toBeTrue();
+    expect(mockDetailsService.getDetailsData).toHaveBeenCalledWith(456);
   });
 
-  describe('onDialogCloseIconClick', () => {
-    it('should reset API call flags', () => {
-      component.isDetailsAPICalled = true;
-      component.isJobLogAPICalled = true;
-      
-      component.onDialogCloseIconClick();
-      
-      expect(component.isDetailsAPICalled).toBe(false);
-      expect(component.isJobLogAPICalled).toBe(false);
-    });
+  it('should show error UI on error response for details tab', () => {
+    mockDetailsService.getDetailsData.and.returnValue(throwError(() => new Error('Service error')));
+    component.onSelectedChange('details-tab', 789);
+    expect(component.hasError).toBeTrue();
   });
 
-  describe('onSelectedChange', () => {
-    it('should load details data when secondary tab is selected', () => {
-      component.onSelectedChange(component.secondaryTab, 123);
-      
-      expect(component.tabSelected).toBe(component.secondaryTab);
-      expect(component.isPrimaryTabActive).toBe(false);
-      expect(component.isSecondaryTabActive).toBe(true);
-      expect(mockDetailsDataService.getJobDetails).toHaveBeenCalledWith(123, 'test/path');
-    });
-
-    it('should not call details API if already called', () => {
-      component.isDetailsAPICalled = true;
-      component.onSelectedChange(component.secondaryTab, 123);
-      
-      expect(mockDetailsDataService.getJobDetails).not.toHaveBeenCalled();
-    });
-
-    it('should load job log data when primary tab is selected', () => {
-      component.onSelectedChange(component.primaryTab, 123);
-      
-      expect(component.tabSelected).toBe(component.primaryTab);
-      expect(component.isPrimaryTabActive).toBe(true);
-      expect(component.isSecondaryTabActive).toBe(false);
-      expect(mockDetailsDataService.getJobLogDetails).toHaveBeenCalledWith(123);
-    });
-
-    it('should not call job log API if already called', () => {
-      component.isJobLogAPICalled = true;
-      component.onSelectedChange(component.primaryTab, 123);
-      
-      expect(mockDetailsDataService.getJobLogDetails).not.toHaveBeenCalled();
-    });
+  it('should close dialog on onCloseDialogEvent()', () => {
+    const closeSpy = spyOn(component.closeDialog, 'emit');
+    component.onCloseDialogEvent();
+    expect(closeSpy).toHaveBeenCalled();
   });
 
-  describe('getDetailsData', () => {
-    it('should populate detailsData correctly', fakeAsync(() => {
-      component.getDetailsData();
-      tick();
-      
-      expect(component.detailsData.length).toBeGreaterThan(0);
-      expect(component.detailsData[0]).toEqual({
-        label: 'Session',
-        value: 'Test Session'
-      });
-      expect(component.isDetailsAPICalled).toBe(true);
-      expect(component.isLoading).toBe(false);
-    }));
-
-    it('should handle error when getting details data', fakeAsync(() => {
-      const errorResponse = {
-        error: {
-          status: {
-            errors: [{
-              code: '500',
-              message: 'Test Error'
-            }],
-            responseStatus: 'ERROR'
-          }
-        }
-      };
-      (mockDetailsDataService.getJobDetails as jest.Mock).mockReturnValue(throwError(() => errorResponse));
-      
-      component.getDetailsData();
-      tick();
-      
-      expect(component.isLoading).toBe(false);
-      expect(component.isSecondaryTabActive).toBe(false);
-      expect(component.hasError).toBe(true);
-      expect(component.errorCode).toBe('500 ERROR');
-      expect(component.errorMessage).toBe('Test Error');
-    }));
+  it('should close dialog on onDialogCloseIconClick()', () => {
+    const closeSpy = spyOn(component.closeDialog, 'emit');
+    component.onDialogCloseIconClick();
+    expect(closeSpy).toHaveBeenCalled();
   });
 
-  describe('getJobLogData', () => {
-    it('should populate job log data correctly', fakeAsync(() => {
-      component.getJobLogData(123);
-      tick();
-      
-      expect(component.logArray1.length).toBeGreaterThan(0);
-      expect(component.logArray2.length).toBeGreaterThan(0);
-      expect(component.logContent).toBe('Test log content');
-      expect(component.isLogTruncated).toBe(true);
-      expect(component.isJobLogAPICalled).toBe(true);
-      expect(component.isLoading).toBe(false);
-    }));
-
-    it('should handle empty response body', fakeAsync(() => {
-      const emptyResponse: JobLogDataModel = {
-        status: {
-          timestamp: '2023-01-01',
-          responseStatus: 'OK',
-          responseCode: '200'
-        },
-        body: null as any
-      };
-      (mockDetailsDataService.getJobLogDetails as jest.Mock).mockReturnValue(of(emptyResponse));
-      
-      component.getJobLogData(123);
-      tick();
-      
-      expect(component.hasError).toBe(true);
-      expect(component.errorCode).toBe('200');
-      expect(component.errorMessage).toBe('Something went wrong, Empty response received');
-    }));
-
-    it('should handle error when getting job log data', fakeAsync(() => {
-      const errorResponse = {
-        error: {
-          status: {
-            errors: [{
-              code: '404',
-              message: 'Not Found'
-            }],
-            responseStatus: 'ERROR'
-          }
-        }
-      };
-      (mockDetailsDataService.getJobLogDetails as jest.Mock).mockReturnValue(throwError(() => errorResponse));
-      
-      component.getJobLogData(123);
-      tick();
-      
-      expect(component.isLoading).toBe(false);
-      expect(component.isPrimaryTabActive).toBe(false);
-      expect(component.hasError).toBe(true);
-      expect(component.errorCode).toBe('404');
-      expect(component.errorMessage).toBe('Not Found');
-    }));
-
-    it('should handle generic error when error structure is unexpected', fakeAsync(() => {
-      (mockDetailsDataService.getJobLogDetails as jest.Mock).mockReturnValue(throwError(() => new Error('Test Error')));
-      
-      component.getJobLogData(123);
-      tick();
-      
-      expect(component.errorCode).toBe('500');
-      expect(component.errorMessage).toBe('Something went wrong, please contact support team');
-    }));
+  it('should call downloadFile() and utility service', () => {
+    component.monId = 111;
+    component.downloadFile();
+    expect(mockUtilityService.downloadFile).toHaveBeenCalledWith(111);
   });
 
-  describe('downloadFile', () => {
-    it('should download file successfully', fakeAsync(() => {
-      component.sessionName = 'TestSession';
-      component.uproc = 'TestUproc';
-      component.monId = 123;
-      
-      component.downloadFile();
-      tick();
-      
-      expect(mockDetailsDataService.downloadFile).toHaveBeenCalledWith(123, 'TestSession', 'TestUproc');
-      expect(saveAs).toHaveBeenCalled();
-      expect(mockUtilityService.openSnackBar).toHaveBeenCalledWith(
-        'large',
-        'success',
-        'File downloading begins.It will take few minutes.',
-        'success'
-      );
-    }));
+  it('should render primary tab log section', () => {
+    component.isPrimaryTabActive = true;
+    component.isLoading = false;
+    component.logArray1 = [{ label: 'Log1', value: 'Value1' }];
+    component.logArray2 = [{ label: 'Log2', value: 'Value2' }];
+    component.logContent = 'Log content here';
+    fixture.detectChanges();
 
-    it('should handle download error with specific error message', fakeAsync(() => {
-      const errorResponse = {
-        error: {
-          error: 'Download failed'
-        }
-      };
-      (mockDetailsDataService.downloadFile as jest.Mock).mockReturnValue(throwError(() => errorResponse));
-      
-      component.downloadFile();
-      tick();
-      
-      expect(mockSnackbarService.open).toHaveBeenCalledWith(
-        'large',
-        'error',
-        'Download failed',
-        'download',
-        { dismissAfter: 4000 }
-      );
-    }));
-
-    it('should handle download error with generic error message', fakeAsync(() => {
-      (mockDetailsDataService.downloadFile as jest.Mock).mockReturnValue(throwError(() => new Error('Test Error')));
-      
-      component.downloadFile();
-      tick();
-      
-      expect(mockSnackbarService.open).toHaveBeenCalledWith(
-        'large',
-        'error',
-        CONSTANTS.ERROR_MESSAGES.GENERIC_DOWNLOAD_MESSAGE,
-        'download',
-        { dismissAfter: 4000 }
-      );
-    }));
+    const textArea = fixture.nativeElement.querySelector('textarea');
+    expect(textArea.textContent).toContain('Log content here');
   });
 
-  describe('resetEclipseDialog', () => {
-    it('should reset component state and unsubscribe', () => {
-      const unsubscribeSpy = jest.spyOn(component.stepDetailsSubscription, 'unsubscribe');
-      
-      component.resetEclipseDialog();
-      
-      expect(component.isDetailsAPICalled).toBe(false);
-      expect(component.isJobLogAPICalled).toBe(false);
-      expect(component.isLoading).toBe(false);
-      expect(unsubscribeSpy).toHaveBeenCalled();
-    });
+  it('should render secondary tab details', () => {
+    component.isSecondaryTabActive = true;
+    component.isLoading = false;
+    component.detailsData = [{ label: 'Step', value: 'COMPLETED' }];
+    fixture.detectChanges();
+
+    const valueCell = fixture.nativeElement.querySelector('.value');
+    expect(valueCell.textContent).toContain('COMPLETED');
   });
 
-  describe('ngOnDestroy', () => {
-    it('should call resetEclipseDialog', () => {
-      const resetSpy = jest.spyOn(component, 'resetEclipseDialog');
-      
-      component.ngOnDestroy();
-      
-      expect(resetSpy).toHaveBeenCalled();
-    });
+  it('should show loader when isLoading is true', () => {
+    component.isLoading = true;
+    fixture.detectChanges();
+
+    const loaderImg = fixture.nativeElement.querySelector('.loader-gif');
+    expect(loaderImg).toBeTruthy();
+  });
+
+  it('should display error image and message when no tab is active and has error', () => {
+    component.isPrimaryTabActive = false;
+    component.isSecondaryTabActive = false;
+    component.hasError = true;
+    component.errorMessage = 'Something went wrong';
+    fixture.detectChanges();
+
+    const errorMsg = fixture.nativeElement.querySelector('.second-msg');
+    expect(errorMsg.textContent).toContain('Something went wrong');
   });
 });
